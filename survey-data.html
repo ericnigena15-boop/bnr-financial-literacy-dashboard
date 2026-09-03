@@ -529,7 +529,7 @@
   const STRATA_COLORS  = ['#6B3A24','#E8A33D','#B5651D','#8C6239'];
   // Display order: paired by age bracket, not grouped by sex. Falls back to
   // alphabetical for any label that doesn't match one of these exactly.
-  const STRATA_ORDER = ['Men 16–30', 'Women 16–30', 'Men 31 and above', 'Women 31 and above'];
+  const STRATA_ORDER = ['Men 16-30', 'Women 16-30', 'Men 31 and above', 'Women 31 and above'];
   function sortStrata(arr) {
     return arr.slice().sort((a, b) => {
       const ia = STRATA_ORDER.indexOf(a), ib = STRATA_ORDER.indexOf(b);
