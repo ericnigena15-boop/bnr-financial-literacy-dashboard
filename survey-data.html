@@ -1,0 +1,1232 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>BNR Financial Literacy Survey Data</title>
+  <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.0/dist/chart.umd.min.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/chartjs-plugin-datalabels@2.2.0/dist/chartjs-plugin-datalabels.min.js"></script>
+  <style>
+    :root {
+      --blue:       #4299e1;
+      --blue-dark:  #2b6cb0;
+      --blue-light: #ebf8ff;
+      --green:      #48bb78;
+      --red:        #fc8181;
+      --yellow:     #f6ad55;
+      --purple:     #805ad5;
+      --pink:       #ed64a6;
+      --orange:     #dd6b20;
+      --gray:       #718096;
+      --border:     #e2e8f0;
+      --bg:         #edf2f7;
+      --white:      #fff;
+    }
+    * { box-sizing: border-box; margin: 0; padding: 0; }
+    body { font-family: 'Segoe UI', sans-serif; background: var(--bg); color: #2d3748; min-height: 100vh; padding: 22px 20px 48px; }
+
+    /* ── Banner ── */
+    #banner {
+      display: flex; align-items: center; gap: 12px;
+      background: var(--white); border-radius: 10px;
+      padding: 13px 18px; margin-bottom: 18px;
+      box-shadow: 0 1px 5px rgba(0,0,0,0.07);
+      font-size: 0.87rem; color: var(--gray);
+    }
+    #banner.error   { color: #9b2c2c; background: #fed7d7; border-left: 4px solid var(--red); }
+    #banner.ready   { color: #276749; background: #f0fff4; border-left: 4px solid var(--green); }
+    #banner.loading { border-left: none; }
+    .spinner {
+      width: 18px; height: 18px; flex-shrink: 0;
+      border: 3px solid #bee3f8; border-top-color: var(--blue);
+      border-radius: 50%; animation: spin 0.8s linear infinite; display: none;
+    }
+    #banner.loading .spinner { display: block; }
+    @keyframes spin { to { transform: rotate(360deg); } }
+    .btn-refresh {
+      flex-shrink: 0; margin-left: auto;
+      padding: 6px 14px; border: 1px solid var(--border);
+      border-radius: 6px; background: rgba(0,0,0,0.04);
+      color: #4a5568; font-size: 0.78rem; font-weight: 600; cursor: pointer; transition: background 0.15s;
+    }
+    .btn-refresh:hover    { background: rgba(0,0,0,0.09); }
+    .btn-refresh:disabled { opacity: 0.4; cursor: not-allowed; }
+
+    .brand-logo {
+      height: 40px;
+      width: auto;
+      display: block;
+    }
+
+    /* ── Date filter bar ── */
+    .filter-bar {
+      background: var(--white); border-radius: 10px;
+      padding: 11px 18px; margin-bottom: 16px;
+      box-shadow: 0 2px 10px rgba(0,0,0,0.10);
+      display: flex; align-items: center; gap: 14px; flex-wrap: wrap;
+      position: sticky; top: 0; z-index: 100;
+    }
+    .filter-label { font-size: 0.82rem; font-weight: 700; color: #4a5568; white-space: nowrap; }
+    .filter-select {
+      padding: 6px 10px; border: 1.5px solid var(--border);
+      border-radius: 7px; font-size: 0.84rem; outline: none;
+      min-width: 180px; transition: border-color 0.15s; cursor: pointer; background: var(--white);
+    }
+    .filter-select:focus { border-color: var(--blue); }
+    .filter-info { font-size: 0.78rem; color: var(--gray); margin-left: auto; }
+
+    /* ── Sections ── */
+    .data-section { display: none; }
+    .data-section.show { display: block; }
+
+    /* ── KPI grid ── */
+    .kpi-grid { display: grid; grid-template-columns: repeat(5,1fr); gap: 14px; margin-bottom: 16px; }
+    .kpi-card {
+      background: var(--white); border-radius: 10px;
+      padding: 16px 18px 14px; box-shadow: 0 1px 5px rgba(0,0,0,0.07);
+      border-top: 3px solid var(--blue);
+    }
+    .kpi-card.green  { border-top-color: var(--green); }
+    .kpi-card.yellow { border-top-color: var(--yellow); }
+    .kpi-card.purple { border-top-color: var(--purple); }
+    .kpi-label { font-size: 0.67rem; font-weight: 700; text-transform: uppercase; letter-spacing: 0.08em; color: var(--gray); margin-bottom: 5px; }
+    .kpi-value { font-size: 1.9rem; font-weight: 800; color: #1a202c; line-height: 1; }
+    .kpi-sub   { font-size: 0.73rem; color: var(--gray); margin-top: 4px; }
+    .kpi-track { height: 4px; background: #e2e8f0; border-radius: 2px; margin-top: 9px; overflow: hidden; }
+    .kpi-fill  { height: 100%; border-radius: 2px; background: var(--blue); transition: width 0.7s ease; }
+    .kpi-card.green  .kpi-fill { background: var(--green); }
+    .kpi-card.yellow .kpi-fill { background: var(--yellow); }
+    .kpi-card.purple .kpi-fill { background: var(--purple); }
+
+    /* ── Row layouts ── */
+    .dash-row-2 { display: grid; grid-template-columns: 1fr 1fr; gap: 14px; margin-bottom: 16px; }
+    .dash-row-3 { display: grid; grid-template-columns: repeat(3, 1fr); gap: 14px; margin-bottom: 16px; }
+    .dash-row-1 { margin-bottom: 16px; }
+
+    /* ── Dash card ── */
+    .dash-card {
+      background: var(--white); border-radius: 10px;
+      padding: 20px 22px; box-shadow: 0 1px 5px rgba(0,0,0,0.07);
+    }
+    .dash-card-title {
+      font-size: 0.87rem; font-weight: 700; color: #1a202c;
+      margin-bottom: 16px;
+      display: flex; align-items: baseline; justify-content: space-between; gap: 8px;
+    }
+    .dash-card-sub { font-size: 0.73rem; font-weight: 400; color: var(--gray); }
+
+    /* ── Strata bars ── */
+    .strata-list { display: flex; flex-direction: column; gap: 14px; }
+    .strata-row-hdr { display: flex; justify-content: space-between; margin-bottom: 4px; align-items: baseline; }
+    .strata-name-lbl { font-size: 0.82rem; font-weight: 700; }
+    .strata-cnt { font-size: 0.79rem; color: var(--gray); }
+    .bar-track { height: 11px; background: #e2e8f0; border-radius: 6px; overflow: hidden; }
+    .bar-fill  { height: 100%; border-radius: 6px; transition: width 0.7s ease; }
+
+    /* ── Phone ownership ── */
+    .phone-list { display: flex; flex-direction: column; gap: 20px; }
+    .phone-block-title {
+      font-size: 0.8rem; font-weight: 700; color: #4a5568;
+      margin-bottom: 10px; display: flex; align-items: center; gap: 6px;
+    }
+    .yn-row { margin-bottom: 10px; }
+    .yn-row:last-child { margin-bottom: 0; }
+    .yn-header { display: flex; justify-content: space-between; align-items: baseline; margin-bottom: 4px; }
+    .yn-label { font-size: 0.8rem; font-weight: 700; }
+    .yn-label.yes { color: #276749; }
+    .yn-label.no  { color: #9b2c2c; }
+    .yn-counts { font-size: 0.76rem; color: var(--gray); }
+    .yn-bar-track { height: 10px; background: #e2e8f0; border-radius: 5px; overflow: hidden; }
+    .yn-bar-fill { height: 100%; border-radius: 5px; transition: width 0.7s ease; }
+    .yn-bar-fill.yes { background: var(--green); }
+    .yn-bar-fill.no  { background: var(--red); }
+    .yn-pct { font-size: 0.71rem; color: var(--gray); margin-top: 2px; text-align: right; }
+    .phone-divider { border: none; border-top: 1.5px solid var(--border); margin: 4px 0 4px; }
+
+    /* ── Daily chart ── */
+    #dailyChart { max-height: 280px; }
+
+    /* ── Village table ── */
+    .tbl-topbar { display: flex; gap: 10px; margin-bottom: 11px; align-items: center; flex-wrap: wrap; }
+    .tbl-search {
+      padding: 7px 12px; border: 1.5px solid var(--border);
+      border-radius: 7px; font-size: 0.84rem; outline: none; width: 220px;
+      transition: border-color 0.15s;
+    }
+    .tbl-search:focus { border-color: var(--blue); }
+    .tbl-info { font-size: 0.78rem; color: var(--gray); }
+    .tbl-scroll { max-height: 420px; overflow-y: auto; border-radius: 8px; border: 1px solid var(--border); }
+    .tbl-scroll table { width: 100%; border-collapse: collapse; font-size: 0.81rem; }
+    .tbl-scroll thead th {
+      position: sticky; top: 0; z-index: 2;
+      background: #f7fafc; padding: 9px 12px;
+      text-align: left; font-size: 0.67rem; font-weight: 700;
+      text-transform: uppercase; letter-spacing: 0.06em; color: var(--gray);
+      border-bottom: 1.5px solid var(--border); white-space: nowrap;
+      cursor: pointer; user-select: none;
+    }
+    .tbl-scroll thead th:hover { background: #edf2f7; }
+    .tbl-scroll thead th.sort-asc::after  { content: ' ↑'; }
+    .tbl-scroll thead th.sort-desc::after { content: ' ↓'; }
+    .tbl-scroll tbody tr { border-bottom: 1px solid #f0f4f8; transition: background 0.1s; }
+    .tbl-scroll tbody tr:last-child { border-bottom: none; }
+    .tbl-scroll tbody tr:hover { background: #f8fafc; }
+    .tbl-scroll td { padding: 8px 12px; vertical-align: middle; }
+    .vname { font-weight: 600; color: #1a202c; }
+    .mini-track { height: 7px; background: #e2e8f0; border-radius: 4px; overflow: hidden; flex: 1; min-width: 60px; }
+    .mini-fill  { height: 100%; border-radius: 4px; background: var(--blue); transition: width 0.5s; }
+    .mini-fill.full { background: var(--green); }
+    .v-badge { display: inline-block; padding: 3px 9px; border-radius: 4px; font-size: 0.71rem; font-weight: 700; white-space: nowrap; }
+    .v-badge-done { background: #c6f6d5; color: #276749; }
+    .v-badge-prog { background: var(--blue-light); color: var(--blue-dark); }
+    .v-badge-none { background: #f7fafc; color: #a0aec0; border: 1px solid var(--border); }
+    .no-data { text-align: center; padding: 40px; color: var(--gray); font-size: 0.88rem; }
+    .strata-tick-col { text-align: center; min-width: 60px; font-size: 0.8rem; font-weight: 700; }
+    .tick-done { color: #276749; }
+    .tick-miss { color: #e53e3e; }
+
+    /* ── Enumerator table (wide, horizontal scroll) ── */
+    #enumScroll {
+      max-height: 480px; overflow-x: auto; overflow-y: auto;
+      border-radius: 8px; border: 1px solid var(--border);
+    }
+    #enumScroll table {
+      min-width: max-content; width: 100%;
+      border-collapse: collapse; font-size: 0.81rem;
+    }
+    #enumScroll thead th {
+      position: sticky; top: 0; z-index: 2;
+      background: #f7fafc; padding: 9px 10px;
+      text-align: right; font-size: 0.67rem; font-weight: 700;
+      text-transform: uppercase; letter-spacing: 0.06em; color: var(--gray);
+      border-bottom: 1.5px solid var(--border); white-space: nowrap;
+      cursor: pointer; user-select: none;
+    }
+    #enumScroll thead th:first-child {
+      text-align: left; left: 0; z-index: 3; position: sticky;
+    }
+    #enumScroll thead th:hover { background: #edf2f7; }
+    #enumScroll thead th.sort-asc::after  { content: ' ↑'; }
+    #enumScroll thead th.sort-desc::after { content: ' ↓'; }
+    #enumScroll tbody tr { border-bottom: 1px solid #f0f4f8; transition: background 0.1s; }
+    #enumScroll tbody tr:last-child { border-bottom: none; }
+    #enumScroll tbody tr:hover { background: #f8fafc; }
+    #enumScroll td {
+      padding: 8px 10px; vertical-align: middle;
+      text-align: right; white-space: nowrap;
+    }
+    #enumScroll td:first-child {
+      text-align: left; font-weight: 600; color: #1a202c;
+      position: sticky; left: 0; background: var(--white); z-index: 1;
+    }
+    #enumScroll tr:hover td:first-child { background: #f8fafc; }
+
+    /* Section time cell colour */
+    .sec-val { color: #553c9a; }
+
+    /* Overall average row */
+    tr.overall-row td {
+      background: #ebf8ff !important;
+      color: var(--blue-dark) !important;
+      font-weight: 700 !important;
+      border-top: 2px solid #bee3f8;
+    }
+    tr.overall-row td:first-child { background: #ebf8ff !important; }
+
+    /* Section group header row */
+    .sec-group-hdr {
+      font-size: 0.65rem; color: #553c9a; font-weight: 700;
+      text-transform: uppercase; letter-spacing: 0.06em;
+      background: #faf5ff !important; border-bottom: 1px solid #e9d8fd !important;
+    }
+
+    @media (max-width: 1100px) {
+      .kpi-grid   { grid-template-columns: repeat(3,1fr); }
+      .dash-row-3 { grid-template-columns: 1fr 1fr; }
+    }
+    @media (max-width: 900px) {
+      .kpi-grid   { grid-template-columns: 1fr 1fr; }
+      .dash-row-2 { grid-template-columns: 1fr; }
+      .dash-row-3 { grid-template-columns: 1fr; }
+    }
+    @media (max-width: 520px) {
+      .kpi-grid { grid-template-columns: 1fr 1fr; }
+    }
+
+  </style>
+</head>
+<body>
+
+
+<!-- Status banner -->
+<div id="banner" class="loading">
+  <div class="spinner"></div>
+  <span id="bannerText">Loading survey data…</span>
+</div>
+
+<div id="dataSection" class="data-section">
+
+  <!-- Date filter bar -->
+  <div class="filter-bar">
+    <span class="filter-label">📅 Date:</span>
+    <select id="dateFilter" class="filter-select" style="min-width:130px">
+      <option value="">All dates</option>
+    </select>
+    <span class="filter-label">📍 Province:</span>
+    <select id="fProvince" class="filter-select" style="min-width:130px">
+      <option value="">All</option>
+    </select>
+    <select id="fDistrict" class="filter-select" style="min-width:130px" disabled>
+      <option value="">All Districts</option>
+    </select>
+    <select id="fSector" class="filter-select" style="min-width:130px" disabled>
+      <option value="">All Sectors</option>
+    </select>
+    <select id="fVillage" class="filter-select" style="min-width:130px" disabled>
+      <option value="">All Villages</option>
+    </select>
+    <span class="filter-label">👥 Strata:</span>
+    <select id="fStrata" class="filter-select" style="min-width:140px">
+      <option value="">All Strata</option>
+    </select>
+    <button id="btnClearFilters" style="padding:6px 12px;border:1.5px solid var(--border);border-radius:7px;background:#f7fafc;font-size:0.82rem;font-weight:600;color:var(--gray);cursor:pointer;">✕ Clear</button>
+    <span class="filter-info" id="filterInfo"></span>
+    <button class="btn-refresh" id="btnRefresh" disabled>↻ Refresh</button>
+  </div>
+
+
+  <!-- KPI cards -->
+  <div class="kpi-grid">
+    <div class="kpi-card">
+      <div class="kpi-label">Surveys Completed</div>
+      <div class="kpi-value" id="kTotal">—</div>
+      <div class="kpi-sub" id="kTotalSub">of 5,008 target</div>
+      <div class="kpi-track"><div class="kpi-fill" id="kTotalBar" style="width:0"></div></div>
+    </div>
+    <div class="kpi-card green">
+      <div class="kpi-label">Completion Rate</div>
+      <div class="kpi-value" id="kRate">—</div>
+      <div class="kpi-sub" id="kRateSub">vs 5,008 target</div>
+      <div class="kpi-track"><div class="kpi-fill" id="kRateBar" style="width:0"></div></div>
+    </div>
+    <div class="kpi-card yellow">
+      <div class="kpi-label">Villages at Target</div>
+      <div class="kpi-value" id="kVill">—</div>
+      <div class="kpi-sub" id="kVillSub">of 1,252 villages</div>
+      <div class="kpi-track"><div class="kpi-fill" id="kVillBar" style="width:0"></div></div>
+    </div>
+    <div class="kpi-card purple">
+      <div class="kpi-label">Overall Avg Survey Duration</div>
+      <div class="kpi-value" id="kAvgDur">—</div>
+      <div class="kpi-sub" id="kAvgDurSub">min / survey (all enumerators)</div>
+      <div class="kpi-track"><div class="kpi-fill" id="kAvgDurBar" style="width:0"></div></div>
+    </div>
+    <div class="kpi-card" style="border-top-color:var(--orange)">
+      <div class="kpi-label">Replacements Done</div>
+      <div class="kpi-value" id="kRepl" style="color:var(--orange)">—</div>
+      <div class="kpi-sub" id="kReplSub">of total surveys</div>
+      <div class="kpi-track"><div class="kpi-fill" id="kReplBar" style="width:0;background:var(--orange)"></div></div>
+    </div>
+  </div>
+
+  <!-- Strata + Phone ownership — 3-column row -->
+  <div class="dash-row-3">
+    <div class="dash-card">
+      <div class="dash-card-title">
+        Progress by Strata (Age &amp; Sex)
+        <span class="dash-card-sub">target 1,252 each</span>
+      </div>
+      <div class="strata-list" id="strataList">
+        <div style="color:var(--gray);font-size:0.85rem">Loading…</div>
+      </div>
+    </div>
+
+    <div class="dash-card">
+      <div class="dash-card-title">📱 Mobile Phone Ownership <span class="dash-card-sub">(a4_02)</span></div>
+      <div style="display:flex;justify-content:space-between;align-items:flex-start;margin-bottom:14px;">
+        <div>
+          <div class="yn-label yes">Yes</div>
+          <div style="font-size:1.5rem;font-weight:800;color:#276749;line-height:1.2" id="mob-yes-count">—</div>
+          <div class="yn-pct" id="mob-yes-pct"></div>
+        </div>
+        <div style="text-align:right">
+          <div class="yn-label no">No</div>
+          <div style="font-size:1.5rem;font-weight:800;color:#9b2c2c;line-height:1.2" id="mob-no-count">—</div>
+          <div class="yn-pct" id="mob-no-pct"></div>
+        </div>
+      </div>
+      <div style="height:90px;position:relative;">
+        <canvas id="mobChart"></canvas>
+      </div>
+    </div>
+
+    <div class="dash-card">
+      <div class="dash-card-title">🤳 Smartphone Ownership <span class="dash-card-sub">(a4_03)</span></div>
+      <div style="display:flex;justify-content:space-between;align-items:flex-start;margin-bottom:14px;">
+        <div>
+          <div class="yn-label yes">Yes</div>
+          <div style="font-size:1.5rem;font-weight:800;color:#276749;line-height:1.2" id="smart-yes-count">—</div>
+          <div class="yn-pct" id="smart-yes-pct"></div>
+        </div>
+        <div style="text-align:right">
+          <div class="yn-label no">No</div>
+          <div style="font-size:1.5rem;font-weight:800;color:#9b2c2c;line-height:1.2" id="smart-no-count">—</div>
+          <div class="yn-pct" id="smart-no-pct"></div>
+        </div>
+      </div>
+      <div style="height:90px;position:relative;">
+        <canvas id="smartChart"></canvas>
+      </div>
+    </div>
+  </div>
+
+  <!-- Daily submissions chart — hidden for admin/supervisor role -->
+  <div class="dash-card dash-row-1" id="dailySection">
+    <div class="dash-card-title">
+      Daily Submissions
+      <span class="dash-card-sub">by submissiondate — daily count</span>
+    </div>
+    <canvas id="dailyChart"></canvas>
+  </div>
+
+  <!-- Village-level table -->
+  <div class="dash-card dash-row-1">
+    <div class="dash-card-title">
+      Village Progress
+      <span class="dash-card-sub" id="villageCountLbl">0 / 1,252 at target</span>
+    </div>
+    <div class="tbl-topbar">
+      <input class="tbl-search" type="search" id="villageSearch" placeholder="Search village, sector…" />
+      <span class="tbl-info" id="tblInfo"></span>
+    </div>
+    <div class="tbl-scroll">
+      <table>
+        <thead id="villThead">
+          <tr>
+            <th data-col="village">Village</th>
+            <th data-col="sector">Sector</th>
+            <th data-col="district">District</th>
+            <th data-col="province">Province</th>
+            <th data-col="count" style="text-align:right">Surveys</th>
+            <th data-col="status">Status</th>
+          </tr>
+        </thead>
+        <tbody id="villTbody">
+          <tr><td colspan="6" class="no-data">Loading…</td></tr>
+        </tbody>
+      </table>
+    </div>
+  </div>
+
+  <!-- Enumerator table -->
+  <div class="dash-card dash-row-1" id="enumSection">
+    <div class="dash-card-title">
+      Enumerator Performance
+      <span class="dash-card-sub" id="enumCountLbl">0 enumerators</span>
+    </div>
+    <div class="tbl-topbar">
+      <input class="tbl-search" type="search" id="enumSearch" placeholder="Search enumerator…" />
+      <span class="tbl-info" id="enumInfo"></span>
+    </div>
+    <!-- Section legend -->
+    <div style="font-size:0.72rem;color:#553c9a;margin-bottom:8px;display:flex;align-items:center;gap:6px;">
+      <span style="font-weight:700;">Sec columns</span>
+      <span style="color:var(--gray)">— avg minutes spent per section per survey. Scroll right to see all sections →</span>
+    </div>
+    <div id="enumScroll">
+      <table>
+        <thead>
+          <tr>
+            <th data-ecol="enumerator" style="min-width:160px">Enumerator</th>
+            <th data-ecol="surveys"  style="text-align:right">Surveys Done</th>
+            <th data-ecol="avgMin"   style="text-align:right;min-width:170px">Avg Full Questionnaire (min)</th>
+            <th data-ecol="minMin"   style="text-align:right">Min (min)</th>
+            <th data-ecol="maxMin"   style="text-align:right">Max (min)</th>
+            <!-- Section avg columns -->
+            <th title="Avg Section A1 duration (min)" style="text-align:right;color:#553c9a">Sec A1</th>
+            <th title="Avg Section A2 duration (min)" style="text-align:right;color:#553c9a">Sec A2</th>
+            <th title="Avg Section A3 duration (min)" style="text-align:right;color:#553c9a">Sec A3</th>
+            <th title="Avg Section A4 duration (min)" style="text-align:right;color:#553c9a">Sec A4</th>
+            <th title="Avg Section A5 duration (min)" style="text-align:right;color:#553c9a">Sec A5</th>
+            <th title="Avg Section B duration (min)"  style="text-align:right;color:#553c9a">Sec B</th>
+            <th title="Avg Section C duration (min)"  style="text-align:right;color:#553c9a">Sec C</th>
+            <th title="Avg Section D duration (min)"  style="text-align:right;color:#553c9a">Sec D</th>
+            <th title="Avg Section E duration (min)"  style="text-align:right;color:#553c9a">Sec E</th>
+            <th title="Avg Section F duration (min)"  style="text-align:right;color:#553c9a">Sec F</th>
+            <th title="Avg Section G duration (min)"  style="text-align:right;color:#553c9a">Sec G</th>
+            <th title="Avg Section H duration (min)"  style="text-align:right;color:#553c9a">Sec H</th>
+            <th title="Avg Section I duration (min)"  style="text-align:right;color:#553c9a">Sec I</th>
+            <th title="Avg Section J duration (min)"  style="text-align:right;color:#553c9a">Sec J</th>
+            <th title="Avg Section K duration (min)"  style="text-align:right;color:#553c9a">Sec K</th>
+            <th title="Avg Section L duration (min)"  style="text-align:right;color:#553c9a">Sec L</th>
+            <th title="Avg Section M duration (min)"  style="text-align:right;color:#553c9a">Sec M</th>
+            <th title="Avg Section O duration (min)"  style="text-align:right;color:#553c9a">Sec O</th>
+            <th title="Avg Section P duration (min)"  style="text-align:right;color:#553c9a">Sec P</th>
+            <th title="Avg Section Q duration (min)"  style="text-align:right;color:#553c9a">Sec Q</th>
+            <th title="Avg Section R duration (min)"  style="text-align:right;color:#553c9a">Sec R</th>
+            <th title="Avg Section U duration (min)"  style="text-align:right;color:#553c9a">Sec U</th>
+            <th title="Avg Section T duration (min)"  style="text-align:right;color:#553c9a">Sec T</th>
+          </tr>
+        </thead>
+        <tbody id="enumTbody">
+          <tr><td colspan="28" class="no-data">Loading…</td></tr>
+        </tbody>
+      </table>
+    </div>
+  </div>
+
+</div><!-- /dataSection -->
+
+<script>
+  /* ═══════════════════════════════════════════════════
+     ROLE  (set by index.html login via sessionStorage)
+  ════════════════════════════════════════════════════ */
+  let currentRole = null;
+
+  function applyRole(role) {
+    currentRole = role;
+    const isAdmin = role === 'admin';
+    document.getElementById('dailySection').style.display = isAdmin ? 'none' : '';
+    document.getElementById('enumSection').style.display  = isAdmin ? 'none' : '';
+  }
+
+  /* ═══════════════════════════════════════════════════
+     SECTION COLUMNS DEFINITION
+  ════════════════════════════════════════════════════ */
+  const SEC_COLS = [
+    { key: 'sec_a1_time', label: 'Sec A1' },
+    { key: 'sec_a2_time', label: 'Sec A2' },
+    { key: 'sec_a3_time', label: 'Sec A3' },
+    { key: 'sec_a4_time', label: 'Sec A4' },
+    { key: 'sec_a5_time', label: 'Sec A5' },
+    { key: 'sec_b_time',  label: 'Sec B'  },
+    { key: 'sec_c_time',  label: 'Sec C'  },
+    { key: 'sec_d_time',  label: 'Sec D'  },
+    { key: 'sec_e_time',  label: 'Sec E'  },
+    { key: 'sec_f_time',  label: 'Sec F'  },
+    { key: 'sec_g_time',  label: 'Sec G'  },
+    { key: 'sec_h_time',  label: 'Sec H'  },
+    { key: 'sec_i_time',  label: 'Sec I'  },
+    { key: 'sec_j_time',  label: 'Sec J'  },
+    { key: 'sec_k_time',  label: 'Sec K'  },
+    { key: 'sec_l_time',  label: 'Sec L'  },
+    { key: 'sec_m_time',  label: 'Sec M'  },
+    { key: 'sec_o_time',  label: 'Sec O'  },
+    { key: 'sec_p_time',  label: 'Sec P'  },
+    { key: 'sec_q_time',  label: 'Sec Q'  },
+    { key: 'sec_r_time',  label: 'Sec R'  },
+    { key: 'sec_u_time',  label: 'Sec U'  },
+    { key: 'sec_t_time',  label: 'Sec T'  },
+  ];
+  const N_COLS = 5 + SEC_COLS.length; // 28 total columns
+
+  Chart.register(ChartDataLabels);
+
+  /* ═══════════════════════════════════════════════════
+     CONFIG
+  ════════════════════════════════════════════════════ */
+  // TODO: replace with the BNR Financial Literacy Survey's Google Apps Script web app URL
+  // (same pattern as the IFPRI dashboard: a Sheet-backed Apps Script that returns { rows: [...] })
+  const SCRIPT_URL     = 'PASTE_BNR_APPS_SCRIPT_WEB_APP_URL_HERE';
+  const TARGET_TOTAL   = 5008;   // 1,252 villages × 4 strata (one respondent per stratum per village)
+  const TARGET_STRATA  = 1252;   // per stratum: Men 16-30 / Men 31+ / Women 16-30 / Women 31+
+  const TARGET_VILLAGE = 4;      // respondents per village
+  const TOTAL_VILLAGES = 1252;   // 313 sectors × 4 villages/sector
+  const STRATA_COLORS  = ['#4299e1','#805ad5','#ed64a6','#f6ad55'];
+
+  /* ═══════════════════════════════════════════════════
+     STATE
+  ════════════════════════════════════════════════════ */
+  const banner      = document.getElementById('banner');
+  const bannerText  = document.getElementById('bannerText');
+  const btnRefresh  = document.getElementById('btnRefresh');
+  const dataSection = document.getElementById('dataSection');
+
+  let dailyChart   = null;
+  let phoneCharts  = { mob: null, smart: null };
+  let allRows      = [];    // full dataset from API
+  let colKeys      = {};    // column key map
+  let villageData  = [];
+  let strataList   = [];
+  let enumData     = [];
+  let overallRow  = null;
+  let villSortCol = 'count',   villSortDir = -1;
+  let enumSortCol = 'surveys', enumSortDir = -1;
+
+  /* ═══════════════════════════════════════════════════
+     HELPERS
+  ════════════════════════════════════════════════════ */
+  function setStatus(msg, type) { banner.className = type; bannerText.textContent = msg; }
+  function pct(n, t)  { return t ? Math.round(n / t * 100) : 0; }
+  function setText(id, v) { const el = document.getElementById(id); if (el) el.textContent = v; }
+  function setWidth(id, v, t) { const el = document.getElementById(id); if (el) el.style.width = `${Math.min(100, pct(v, t))}%`; }
+  function fmt(v, dp = 1) { return v != null && isFinite(v) ? v.toFixed(dp) : '—'; }
+  function findCol(keys, name) {
+    return keys.find(k => k.trim().toLowerCase() === name.toLowerCase()) || null;
+  }
+
+  /* ═══════════════════════════════════════════════════
+     DATE FILTER
+  ════════════════════════════════════════════════════ */
+  // Converts a raw date value from Google Sheets (may arrive as a UTC ISO string like
+  // "2024-01-14T21:00:00.000Z") into the correct local-timezone date string "YYYY-MM-DD".
+  // Using .substring(0,10) on a UTC ISO string causes an off-by-one day for UTC+ timezones.
+  function toLocalDateStr(val) {
+    const s = String(val ?? '').trim();
+    if (!s) return '';
+    if (/^\d{4}-\d{2}-\d{2}$/.test(s)) return s; // already a plain date
+    const dt = new Date(s);
+    if (isNaN(dt)) return s.substring(0, 10);
+    const y = dt.getFullYear();
+    const m = String(dt.getMonth() + 1).padStart(2, '0');
+    const d = String(dt.getDate()).padStart(2, '0');
+    return `${y}-${m}-${d}`;
+  }
+
+  function populateDateFilter(rows, dateKey) {
+    if (!dateKey) return;
+    const dates = [...new Set(
+      rows.map(r => toLocalDateStr(r[dateKey])).filter(Boolean)
+    )].sort();
+    const sel = document.getElementById('dateFilter');
+    const cur = sel.value;
+    sel.innerHTML = '<option value="">All dates</option>' +
+      dates.map(d => `<option value="${d}"${d === cur ? ' selected' : ''}>${d}</option>`).join('');
+  }
+
+  function getFiltered() {
+    const date     = document.getElementById('dateFilter').value;
+    const province = document.getElementById('fProvince').value;
+    const district = document.getElementById('fDistrict').value;
+    const sector   = document.getElementById('fSector').value;
+    const village  = document.getElementById('fVillage').value;
+    const strata   = document.getElementById('fStrata').value;
+    return allRows.filter(r =>
+      (!date     || toLocalDateStr(r[colKeys.date]) === date) &&
+      (!province || String(r[colKeys.province] ?? '').trim() === province) &&
+      (!district || String(r[colKeys.district] ?? '').trim() === district) &&
+      (!sector   || String(r[colKeys.sector]   ?? '').trim() === sector)   &&
+      (!village  || String(r[colKeys.village]  ?? '').trim() === village)  &&
+      (!strata   || String(r[colKeys.strata]   ?? '').trim() === strata)
+    );
+  }
+
+  function applyFilters() {
+    const filtered = getFiltered();
+    setText('filterInfo', `${filtered.length.toLocaleString()} of ${allRows.length.toLocaleString()} rows`);
+    renderAll(filtered);
+  }
+
+  function populateLocationFilters(rows) {
+    const ck = colKeys;
+    const uniq = (arr) => [...new Set(arr.filter(Boolean))].sort();
+
+    // Province
+    const provSel = document.getElementById('fProvince');
+    const curProv = provSel.value;
+    provSel.innerHTML = '<option value="">All Provinces</option>' +
+      uniq(rows.map(r => String(r[ck.province] ?? '').trim()))
+        .map(v => `<option value="${v}"${v === curProv ? ' selected' : ''}>${v}</option>`).join('');
+    provSel.disabled = false;
+
+    // District (cascade from province)
+    const provVal = provSel.value;
+    const distRows = provVal ? rows.filter(r => String(r[ck.province] ?? '').trim() === provVal) : rows;
+    const distSel = document.getElementById('fDistrict');
+    const curDist = distSel.value;
+    distSel.innerHTML = '<option value="">All Districts</option>' +
+      uniq(distRows.map(r => String(r[ck.district] ?? '').trim()))
+        .map(v => `<option value="${v}"${v === curDist ? ' selected' : ''}>${v}</option>`).join('');
+    distSel.disabled = false;
+
+    // Sector
+    const distVal = distSel.value;
+    const sectRows = distVal ? distRows.filter(r => String(r[ck.district] ?? '').trim() === distVal) : distRows;
+    const sectSel = document.getElementById('fSector');
+    const curSect = sectSel.value;
+    sectSel.innerHTML = '<option value="">All Sectors</option>' +
+      uniq(sectRows.map(r => String(r[ck.sector] ?? '').trim()))
+        .map(v => `<option value="${v}"${v === curSect ? ' selected' : ''}>${v}</option>`).join('');
+    sectSel.disabled = false;
+
+    // Village
+    const sectVal = sectSel.value;
+    const villRows = sectVal ? sectRows.filter(r => String(r[ck.sector] ?? '').trim() === sectVal) : sectRows;
+    const villSel = document.getElementById('fVillage');
+    const curVill = villSel.value;
+    villSel.innerHTML = '<option value="">All Villages</option>' +
+      uniq(villRows.map(r => String(r[ck.village] ?? '').trim()))
+        .map(v => `<option value="${v}"${v === curVill ? ' selected' : ''}>${v}</option>`).join('');
+    villSel.disabled = false;
+
+    // Strata
+    const strataSel = document.getElementById('fStrata');
+    const curStrata = strataSel.value;
+    strataSel.innerHTML = '<option value="">All Strata</option>' +
+      uniq(rows.map(r => String(r[ck.strata] ?? '').trim()))
+        .map(v => `<option value="${v}"${v === curStrata ? ' selected' : ''}>${v}</option>`).join('');
+  }
+
+  /* ═══════════════════════════════════════════════════
+     STRATA
+  ════════════════════════════════════════════════════ */
+  function renderStrata(rows, strataKey) {
+    const container = document.getElementById('strataList');
+    if (!strataKey) {
+      container.innerHTML = '<div style="color:var(--gray);font-size:0.85rem">strata column not found in data.</div>';
+      return;
+    }
+    const counts = {};
+    for (const r of rows) {
+      const s = String(r[strataKey] ?? '').trim();
+      if (s) counts[s] = (counts[s] || 0) + 1;
+    }
+    const entries = Object.entries(counts).sort((a, b) => a[0].localeCompare(b[0]));
+    container.innerHTML = entries.length
+      ? entries.map(([label, count], i) => {
+          const p = Math.min(100, Math.round(count / TARGET_STRATA * 100));
+          const color = STRATA_COLORS[i % STRATA_COLORS.length];
+          return `<div>
+            <div class="strata-row-hdr">
+              <span class="strata-name-lbl" style="color:${color}">${label}</span>
+              <span class="strata-cnt">${count.toLocaleString()} / ${TARGET_STRATA.toLocaleString()}</span>
+            </div>
+            <div class="bar-track">
+              <div class="bar-fill" style="width:${p}%;background:${color}"></div>
+            </div>
+          </div>`;
+        }).join('')
+      : '<div style="color:var(--gray);font-size:0.85rem">No strata data found.</div>';
+  }
+
+  /* ═══════════════════════════════════════════════════
+     PHONE OWNERSHIP
+  ════════════════════════════════════════════════════ */
+  function renderPhone(prefix, rows, colKey) {
+    let yes = 0, no = 0;
+    if (colKey) {
+      for (const r of rows) {
+        const v = String(r[colKey] ?? '').trim().toLowerCase();
+        if (v === 'yes' || v === '1') yes++;
+        else if (v === 'no' || v === '0') no++;
+      }
+    }
+    const total = yes + no;
+    setText(`${prefix}-yes-count`, yes.toLocaleString());
+    setText(`${prefix}-no-count`,  no.toLocaleString());
+    setText(`${prefix}-yes-pct`, total ? `${pct(yes, total)}% of respondents` : '');
+    setText(`${prefix}-no-pct`,  total ? `${pct(no,  total)}% of respondents` : '');
+
+    // Stacked horizontal bar chart
+    const canvas = document.getElementById(`${prefix}Chart`);
+    if (!canvas) return;
+    if (phoneCharts[prefix]) {
+      phoneCharts[prefix].data.datasets[0].data = [yes];
+      phoneCharts[prefix].data.datasets[1].data = [no];
+      phoneCharts[prefix].options.scales.x.max  = total || 1;
+      phoneCharts[prefix].update();
+    } else {
+      phoneCharts[prefix] = new Chart(canvas, {
+        type: 'bar',
+        data: {
+          labels: [''],
+          datasets: [
+            { label: 'Yes', data: [yes], backgroundColor: '#48bb78', borderSkipped: false, borderRadius: 4 },
+            { label: 'No',  data: [no],  backgroundColor: '#fc8181', borderSkipped: false, borderRadius: 4 }
+          ]
+        },
+        options: {
+          indexAxis: 'y',
+          responsive: true,
+          maintainAspectRatio: false,
+          plugins: {
+            datalabels: { display: false },
+            legend: {
+              position: 'bottom',
+              labels: { font: { size: 11 }, padding: 8, usePointStyle: true, pointStyleWidth: 8 }
+            },
+            tooltip: {
+              callbacks: {
+                label: ctx => {
+                  const ds = phoneCharts[prefix].data.datasets;
+                  const t  = (ds[0].data[0] || 0) + (ds[1].data[0] || 0);
+                  return ` ${ctx.dataset.label}: ${ctx.parsed.x.toLocaleString()} (${pct(ctx.parsed.x, t)}%)`;
+                }
+              }
+            }
+          },
+          scales: {
+            x: { stacked: true, display: false, max: total || 1 },
+            y: { stacked: true, display: false }
+          }
+        }
+      });
+    }
+  }
+
+
+  /* ═══════════════════════════════════════════════════
+     DAILY CHART
+  ════════════════════════════════════════════════════ */
+  function renderDaily(rows, dateKey) {
+    if (!dateKey) return;
+    const byDate = {};
+    for (const r of rows) {
+      const d = toLocalDateStr(r[dateKey]);
+      if (d) byDate[d] = (byDate[d] || 0) + 1;
+    }
+    const dates  = Object.keys(byDate).sort();
+    const daily  = dates.map(d => byDate[d]);
+    const labels = dates.map(d => {
+      const dt = new Date(d + 'T00:00:00');
+      return isNaN(dt) ? d : dt.toLocaleDateString('en-GB', { day:'2-digit', month:'short' });
+    });
+
+    if (dailyChart) {
+      dailyChart.data.labels = labels;
+      dailyChart.data.datasets[0].data = daily;
+      dailyChart.update();
+    } else {
+      dailyChart = new Chart(document.getElementById('dailyChart'), {
+        type: 'bar',
+        data: {
+          labels,
+          datasets: [
+            { label: 'Daily Submissions', data: daily,
+              backgroundColor: 'rgba(66,153,225,0.75)',
+              hoverBackgroundColor: '#2b6cb0',
+              borderRadius: 5, borderSkipped: false }
+          ]
+        },
+        options: {
+          responsive: true,
+          interaction: { mode: 'index', intersect: false },
+          layout: { padding: { top: 22 } },
+          plugins: {
+            legend: { display: false },
+            datalabels: {
+              anchor: 'end',
+              align: 'end',
+              offset: 0,
+              formatter: v => v,
+              font: { size: 11, weight: '700' },
+              color: '#2b6cb0'
+            }
+          },
+          scales: {
+            x: { grid: { display: false }, ticks: { font: { size: 11 } } },
+            y: { beginAtZero: true, grid: { color: '#f0f4f8' }, ticks: { font: { size: 11 } } }
+          }
+        }
+      });
+    }
+  }
+
+  /* ═══════════════════════════════════════════════════
+     VILLAGE TABLE
+  ════════════════════════════════════════════════════ */
+  function renderVillageTable() {
+    const search = document.getElementById('villageSearch').value.toLowerCase();
+    let list = villageData.filter(v =>
+      !search ||
+      v.village.toLowerCase().includes(search) ||
+      v.sector.toLowerCase().includes(search) ||
+      v.district.toLowerCase().includes(search) ||
+      v.province.toLowerCase().includes(search)
+    );
+    list.sort((a, b) => {
+      const va = a[villSortCol] ?? '', vb = b[villSortCol] ?? '';
+      return (typeof va === 'number' ? va - vb : String(va).localeCompare(String(vb))) * villSortDir;
+    });
+
+    const atTarget = villageData.filter(v => v.status === 'complete').length;
+    setText('villageCountLbl', `${atTarget} / ${villageData.length} at target`);
+    setText('tblInfo', `${list.length} village${list.length !== 1 ? 's' : ''} shown`);
+
+    const tbody = document.getElementById('villTbody');
+    if (!list.length) {
+      tbody.innerHTML = `<tr><td colspan="${totalCols}" class="no-data">No villages match.</td></tr>`;
+      return;
+    }
+    // Rebuild thead with dynamic strata columns
+    const strataHeaders = strataList.map(s =>
+      `<th class="strata-tick-col" style="cursor:default">${s}</th>`
+    ).join('');
+    const totalCols = 6 + strataList.length;
+    document.getElementById('villThead').innerHTML = `<tr>
+      <th data-col="village" style="cursor:pointer">Village</th>
+      <th data-col="sector"   style="cursor:pointer">Sector</th>
+      <th data-col="district" style="cursor:pointer">District</th>
+      <th data-col="province" style="cursor:pointer">Province</th>
+      <th data-col="count"    style="cursor:pointer;text-align:right">Surveys</th>
+      ${strataHeaders}
+      <th data-col="status"   style="cursor:pointer">Status</th>
+    </tr>`;
+
+    tbody.innerHTML = list.map(v => {
+      const full    = v.status === 'complete';
+      const started = v.count > 0;
+      const bc = full ? 'v-badge-done' : started ? 'v-badge-prog' : 'v-badge-none';
+      const bt = full ? '✓ Complete' : started ? 'In progress' : 'Not started';
+      const tickCells = strataList.map(s => {
+        const cnt  = (v.strataCounts && v.strataCounts[s]) || 0;
+        const done = cnt >= 1; // one respondent per stratum per village = complete
+        return `<td class="strata-tick-col"><span class="${done ? 'tick-done' : 'tick-miss'}">${done ? '✓' : cnt}</span></td>`;
+      }).join('');
+      return `<tr>
+        <td class="vname">${v.village}</td>
+        <td>${v.sector}</td><td>${v.district}</td><td>${v.province}</td>
+        <td style="text-align:right;font-weight:700">${v.count}</td>
+        ${tickCells}
+        <td><span class="v-badge ${bc}">${bt}</span></td>
+      </tr>`;
+    }).join('');
+  }
+
+  /* ═══════════════════════════════════════════════════
+     ENUMERATOR TABLE
+  ════════════════════════════════════════════════════ */
+  function renderEnumeratorTable() {
+    const search = document.getElementById('enumSearch').value.toLowerCase();
+    let list = enumData.filter(e => !search || e.enumerator.toLowerCase().includes(search));
+
+    list.sort((a, b) => {
+      const va = a[enumSortCol] ?? -Infinity, vb = b[enumSortCol] ?? -Infinity;
+      return (typeof va === 'number' ? va - vb : String(va).localeCompare(String(vb))) * enumSortDir;
+    });
+
+    setText('enumCountLbl', `${list.length} enumerator${list.length !== 1 ? 's' : ''}`);
+    setText('enumInfo', `${list.length} shown`);
+
+    const tbody = document.getElementById('enumTbody');
+    if (!list.length) {
+      tbody.innerHTML = `<tr><td colspan="${N_COLS}" class="no-data">No enumerator data yet.</td></tr>`;
+      return;
+    }
+
+    // Individual rows
+    const rowsHtml = list.map(e => {
+      const secCells = SEC_COLS.map(sc =>
+        `<td class="sec-val">${fmt(e.secAvgs[sc.key])}</td>`
+      ).join('');
+      return `<tr>
+        <td>${e.enumerator}</td>
+        <td style="font-weight:700">${e.surveys}</td>
+        <td style="color:var(--blue-dark);font-weight:600">${fmt(e.avgMin)}</td>
+        <td style="color:var(--green)">${fmt(e.minMin)}</td>
+        <td style="color:var(--red)">${fmt(e.maxMin)}</td>
+        ${secCells}
+      </tr>`;
+    }).join('');
+
+    // Overall average row (pinned at bottom)
+    let overallHtml = '';
+    if (overallRow) {
+      const oSecCells = SEC_COLS.map(sc =>
+        `<td>${fmt(overallRow.secAvgs[sc.key])}</td>`
+      ).join('');
+      overallHtml = `<tr class="overall-row">
+        <td>⌀ Overall Average</td>
+        <td>${overallRow.surveys.toLocaleString()} surveys</td>
+        <td>${fmt(overallRow.avgMin)}</td>
+        <td>${fmt(overallRow.minMin)}</td>
+        <td>${fmt(overallRow.maxMin)}</td>
+        ${oSecCells}
+      </tr>`;
+    }
+
+    tbody.innerHTML = rowsHtml + overallHtml;
+  }
+
+  /* ═══════════════════════════════════════════════════
+     RENDER ALL (called on load + every filter change)
+  ════════════════════════════════════════════════════ */
+  function renderAll(rows) {
+    const ck = colKeys;
+
+    /* — KPIs — */
+    const uniqueIds = new Set();
+    for (const r of rows) {
+      const uid = String(r[ck.unique] ?? '').trim();
+      if (uid && uid !== 'undefined') uniqueIds.add(uid);
+    }
+    const total = uniqueIds.size;
+    setText('kTotal', total.toLocaleString());
+    setText('kTotalSub', `of ${TARGET_TOTAL.toLocaleString()} target — ${pct(total, TARGET_TOTAL)}%`);
+    setWidth('kTotalBar', total, TARGET_TOTAL);
+    setText('kRate', `${pct(total, TARGET_TOTAL)}%`);
+    setText('kRateSub', `${total.toLocaleString()} of ${TARGET_TOTAL.toLocaleString()} surveys`);
+    setWidth('kRateBar', total, TARGET_TOTAL);
+
+    /* — Replacements — */
+    if (ck.repl) {
+      const replCount = rows.filter(r => String(r[ck.repl] ?? '').trim().toLowerCase() === 'yes').length;
+      setText('kRepl', replCount.toLocaleString());
+      setText('kReplSub', `of ${total.toLocaleString()} surveys (${pct(replCount, total)}%)`);
+      setWidth('kReplBar', replCount, total);
+    }
+
+    /* — Village aggregation — */
+    if (ck.village) {
+      const vMap = {};
+      const allStrata = new Set();
+      for (const r of rows) {
+        const vill = String(r[ck.village]    ?? '').trim();
+        if (!vill) continue;
+        const dist = String(r[ck.district]   ?? '').trim();
+        const sect = String(r[ck.sector]     ?? '').trim();
+        const mapKey = `${dist}|${sect}|${vill}`;
+        const sv = ck.strata ? String(r[ck.strata] ?? '').trim() : '';
+        if (sv) allStrata.add(sv);
+        if (!vMap[mapKey]) {
+          vMap[mapKey] = {
+            village:  vill,
+            sector:   sect,
+            district: dist,
+            province: String(r[ck.province] ?? '').trim(),
+            count: 0, strataCounts: {}, status: '',
+            strataAtTarget: 0, totalStrata: 0,
+          };
+        }
+        vMap[mapKey].count++;
+        if (sv) vMap[mapKey].strataCounts[sv] = (vMap[mapKey].strataCounts[sv] || 0) + 1;
+      }
+      strataList  = Array.from(allStrata).sort();
+      villageData = Object.values(vMap);
+      villageData.forEach(v => {
+        v.totalStrata    = strataList.length;
+        v.strataAtTarget = strataList.filter(s => (v.strataCounts[s] || 0) >= 1).length; // 1 respondent per stratum per village
+        const complete   = strataList.length > 0 && v.strataAtTarget === strataList.length;
+        v.status = complete ? 'complete' : v.count > 0 ? 'in progress' : 'not started';
+      });
+      const atTarget = villageData.filter(v => v.status === 'complete').length;
+      setText('kVill', atTarget);
+      setText('kVillSub', `${pct(atTarget, TOTAL_VILLAGES)}% of ${TOTAL_VILLAGES.toLocaleString()} villages`);
+      setWidth('kVillBar', atTarget, TOTAL_VILLAGES);
+    } else {
+      villageData = []; strataList = [];
+      setText('kVill', '—');
+      setText('kVillSub', 'mob_village column not found');
+    }
+
+    /* — Strata / phone / chart — */
+    renderStrata(rows, ck.strata);
+    renderPhone('mob',   rows, ck.mob);
+    renderPhone('smart', rows, ck.smart);
+    renderDaily(rows, ck.date);
+    renderVillageTable();
+
+    /* — Enumerator aggregation — */
+    if (ck.enum) {
+      const eMap = {};
+      // Grand totals for the Overall Average row
+      let grandDurTotal = 0, grandDurCount = 0, grandMin = Infinity, grandMax = -Infinity;
+      const grandSecTotals = Object.fromEntries(SEC_COLS.map(sc => [sc.key, 0]));
+      const grandSecCounts = Object.fromEntries(SEC_COLS.map(sc => [sc.key, 0]));
+
+      for (const r of rows) {
+        const name = String(r[ck.enum] ?? '').trim();
+        if (!name) continue;
+        if (!eMap[name]) {
+          eMap[name] = {
+            enumerator: name,
+            surveys:    0,
+            totalMin:   0,
+            minMin:     Infinity,
+            maxMin:     -Infinity,
+            hasDur:     false,
+            secTotals:  Object.fromEntries(SEC_COLS.map(sc => [sc.key, 0])),
+            secCounts:  Object.fromEntries(SEC_COLS.map(sc => [sc.key, 0])),
+          };
+        }
+        eMap[name].surveys++;
+
+        // Full questionnaire duration (already in minutes)
+        if (ck.dur) {
+          const dur = parseFloat(r[ck.dur]);
+          if (!isNaN(dur) && dur > 0) {
+            eMap[name].totalMin += dur;
+            eMap[name].minMin    = Math.min(eMap[name].minMin, dur);
+            eMap[name].maxMin    = Math.max(eMap[name].maxMin, dur);
+            eMap[name].hasDur    = true;
+            grandDurTotal += dur;
+            grandDurCount++;
+            grandMin = Math.min(grandMin, dur);
+            grandMax = Math.max(grandMax, dur);
+          }
+        }
+
+        // Section times — already in minutes in Google Sheet
+        for (const sc of SEC_COLS) {
+          const actualKey = ck.sec[sc.key];
+          if (actualKey) {
+            const sv = parseFloat(r[actualKey]);
+            if (!isNaN(sv) && sv > 0) {
+              eMap[name].secTotals[sc.key] += sv;
+              eMap[name].secCounts[sc.key]++;
+              grandSecTotals[sc.key] += sv;
+              grandSecCounts[sc.key]++;
+            }
+          }
+        }
+      }
+
+      enumData = Object.values(eMap).map(e => ({
+        enumerator: e.enumerator,
+        surveys:    e.surveys,
+        totalMin:   e.totalMin,
+        avgMin:     e.hasDur ? e.totalMin / e.surveys : null,
+        minMin:     e.hasDur ? e.minMin : null,
+        maxMin:     e.hasDur ? e.maxMin : null,
+        secAvgs:    Object.fromEntries(SEC_COLS.map(sc => [
+          sc.key,
+          e.secCounts[sc.key] > 0 ? e.secTotals[sc.key] / e.secCounts[sc.key] : null
+        ])),
+      }));
+
+      // Overall average (weighted — across all individual surveys, not mean-of-means)
+      const overallAvgMin = grandDurCount > 0 ? grandDurTotal / grandDurCount : null;
+      setText('kAvgDur', overallAvgMin != null ? overallAvgMin.toFixed(1) : '—');
+      setText('kAvgDurSub', grandDurCount > 0
+        ? `min / survey · ${grandDurCount.toLocaleString()} surveys timed`
+        : 'no duration data');
+      // Bar: reference 120 min as "full" for the progress bar
+      setWidth('kAvgDurBar', overallAvgMin ?? 0, 120);
+
+      overallRow = {
+        surveys: grandDurCount,
+        avgMin:  overallAvgMin,
+        minMin:  grandDurCount > 0 ? grandMin : null,
+        maxMin:  grandDurCount > 0 ? grandMax : null,
+        secAvgs: Object.fromEntries(SEC_COLS.map(sc => [
+          sc.key,
+          grandSecCounts[sc.key] > 0 ? grandSecTotals[sc.key] / grandSecCounts[sc.key] : null
+        ])),
+      };
+    } else {
+      enumData   = [];
+      overallRow = null;
+      setText('kAvgDur', '—');
+      setText('kAvgDurSub', 'enumerator column not found');
+    }
+
+    renderEnumeratorTable();
+  }
+
+  /* ═══════════════════════════════════════════════════
+     EVENT LISTENERS
+  ════════════════════════════════════════════════════ */
+  document.getElementById('dateFilter').addEventListener('change', applyFilters);
+  document.getElementById('fProvince').addEventListener('change', () => { populateLocationFilters(allRows); applyFilters(); });
+  document.getElementById('fDistrict').addEventListener('change', () => { populateLocationFilters(allRows); applyFilters(); });
+  document.getElementById('fSector').addEventListener('change',   () => { populateLocationFilters(allRows); applyFilters(); });
+  document.getElementById('fVillage').addEventListener('change',  applyFilters);
+  document.getElementById('fStrata').addEventListener('change',   applyFilters);
+  document.getElementById('btnClearFilters').addEventListener('click', () => {
+    ['dateFilter','fProvince','fDistrict','fSector','fVillage','fStrata'].forEach(id => {
+      document.getElementById(id).value = '';
+    });
+    populateLocationFilters(allRows);
+    applyFilters();
+  });
+  document.getElementById('enumSearch').addEventListener('input', renderEnumeratorTable);
+  document.getElementById('villageSearch').addEventListener('input', renderVillageTable);
+
+  // Enumerator sort (fixed columns only)
+  document.querySelectorAll('#enumScroll thead th[data-ecol]').forEach(th => {
+    th.addEventListener('click', () => {
+      const col = th.dataset.ecol;
+      document.querySelectorAll('#enumScroll thead th[data-ecol]').forEach(h => h.classList.remove('sort-asc','sort-desc'));
+      enumSortDir = enumSortCol === col ? enumSortDir * -1 : -1;
+      enumSortCol = col;
+      th.classList.add(enumSortDir === 1 ? 'sort-asc' : 'sort-desc');
+      renderEnumeratorTable();
+    });
+  });
+
+  // Village sort — event delegation because thead is rebuilt dynamically
+  document.querySelector('.tbl-scroll table').addEventListener('click', e => {
+    const th = e.target.closest('th[data-col]');
+    if (!th) return;
+    document.querySelectorAll('#villThead th').forEach(h => h.classList.remove('sort-asc','sort-desc'));
+    villSortDir = villSortCol === th.dataset.col ? villSortDir * -1 : -1;
+    villSortCol = th.dataset.col;
+    th.classList.add(villSortDir === 1 ? 'sort-asc' : 'sort-desc');
+    renderVillageTable();
+  });
+
+  /* ═══════════════════════════════════════════════════
+     MAIN DATA LOADER
+  ════════════════════════════════════════════════════ */
+  async function loadData() {
+    btnRefresh.disabled = true;
+    dataSection.classList.remove('show');
+    allRows = []; villageData = []; strataList = []; enumData = []; overallRow = null;
+    setStatus('Loading survey data from Google Sheets…', 'loading');
+
+    try {
+      const res  = await fetch(`${SCRIPT_URL}?t=${Date.now()}`);
+      const json = await res.json();
+      if (json.error) throw new Error(json.error);
+
+      const rows = json.rows || [];
+      if (!rows.length) throw new Error('No rows returned — is the SurveyData sheet populated?');
+
+      const keys = Object.keys(rows[0]);
+
+      // Build column key map (case-insensitive)
+      colKeys = {
+        unique:   findCol(keys, 'uniqueid'),
+        province: findCol(keys, 'mob_province'),
+        district: findCol(keys, 'mob_district'),
+        sector:   findCol(keys, 'mob_sector'),
+        village:  findCol(keys, 'mob_village'),
+        mob:         findCol(keys, 'a4_02'),
+        smart:       findCol(keys, 'a4_03'),
+        date:        findCol(keys, 'submissiondate') || findCol(keys, 'submission_date_only'),
+        strata:   findCol(keys, 'strata'),
+        enum:     findCol(keys, 'enumerator'),
+        dur:      findCol(keys, 'total_duration_min'),
+        repl:     findCol(keys, 'youth_replacement'),
+        sec:      Object.fromEntries(SEC_COLS.map(sc => [sc.key, findCol(keys, sc.key)])),
+      };
+
+      if (!colKeys.unique) throw new Error(`"uniqueid" column not found. Columns: ${keys.join(', ')}`);
+
+      allRows = rows;
+
+      populateDateFilter(rows, colKeys.date);
+      populateLocationFilters(rows);
+      setText('filterInfo', `All ${rows.length.toLocaleString()} rows`);
+
+      renderAll(rows);
+
+      dataSection.classList.add('show');
+      if (currentRole) applyRole(currentRole);
+      setStatus(
+        `✓ ${rows.length.toLocaleString()} survey rows loaded · ${new Date().toLocaleTimeString()}`,
+        'ready'
+      );
+    } catch (err) {
+      console.error(err);
+      setStatus(`Error: ${err.message}`, 'error');
+      document.getElementById('villTbody').innerHTML =
+        `<tr><td colspan="7" class="no-data">${String(err.message).replace(/</g,'&lt;')}</td></tr>`;
+    } finally {
+      btnRefresh.disabled = false;
+    }
+  }
+
+  btnRefresh.addEventListener('click', loadData);
+
+  // Read role from sessionStorage set by index.html
+  const savedRole = sessionStorage.getItem('bnr_role');
+  if (!savedRole) {
+    window.location.href = 'index.html';
+  } else {
+    applyRole(savedRole);
+    loadData();
+  }
+</script>
+</body>
+</html>
