@@ -221,9 +221,6 @@
     }
     #enumScroll tr:hover td:first-child { background: #f8fafc; }
 
-    /* Section time cell colour */
-    .sec-val { color: #553c9a; }
-
     /* Overall average row */
     tr.overall-row td {
       background: #ebf8ff !important;
@@ -232,13 +229,6 @@
       border-top: 2px solid #bee3f8;
     }
     tr.overall-row td:first-child { background: #ebf8ff !important; }
-
-    /* Section group header row */
-    .sec-group-hdr {
-      font-size: 0.65rem; color: #553c9a; font-weight: 700;
-      text-transform: uppercase; letter-spacing: 0.06em;
-      background: #faf5ff !important; border-bottom: 1px solid #e9d8fd !important;
-    }
 
     @media (max-width: 1100px) {
       .kpi-grid   { grid-template-columns: repeat(3,1fr); }
@@ -342,7 +332,7 @@
     </div>
 
     <div class="dash-card">
-      <div class="dash-card-title">📱 Mobile Phone Ownership <span class="dash-card-sub">(a4_02)</span></div>
+      <div class="dash-card-title">💰 Mobile Money Ownership <span class="dash-card-sub">(own_mobile_money)</span></div>
       <div style="display:flex;justify-content:space-between;align-items:flex-start;margin-bottom:14px;">
         <div>
           <div class="yn-label yes">Yes</div>
@@ -361,7 +351,7 @@
     </div>
 
     <div class="dash-card">
-      <div class="dash-card-title">🤳 Smartphone Ownership <span class="dash-card-sub">(a4_03)</span></div>
+      <div class="dash-card-title">🤳 Smartphone Access <span class="dash-card-sub">(smartphone_access)</span></div>
       <div style="display:flex;justify-content:space-between;align-items:flex-start;margin-bottom:14px;">
         <div>
           <div class="yn-label yes">Yes</div>
@@ -428,11 +418,6 @@
       <input class="tbl-search" type="search" id="enumSearch" placeholder="Search enumerator…" />
       <span class="tbl-info" id="enumInfo"></span>
     </div>
-    <!-- Section legend -->
-    <div style="font-size:0.72rem;color:#553c9a;margin-bottom:8px;display:flex;align-items:center;gap:6px;">
-      <span style="font-weight:700;">Sec columns</span>
-      <span style="color:var(--gray)">— avg minutes spent per section per survey. Scroll right to see all sections →</span>
-    </div>
     <div id="enumScroll">
       <table>
         <thead>
@@ -442,34 +427,10 @@
             <th data-ecol="avgMin"   style="text-align:right;min-width:170px">Avg Full Questionnaire (min)</th>
             <th data-ecol="minMin"   style="text-align:right">Min (min)</th>
             <th data-ecol="maxMin"   style="text-align:right">Max (min)</th>
-            <!-- Section avg columns -->
-            <th title="Avg Section A1 duration (min)" style="text-align:right;color:#553c9a">Sec A1</th>
-            <th title="Avg Section A2 duration (min)" style="text-align:right;color:#553c9a">Sec A2</th>
-            <th title="Avg Section A3 duration (min)" style="text-align:right;color:#553c9a">Sec A3</th>
-            <th title="Avg Section A4 duration (min)" style="text-align:right;color:#553c9a">Sec A4</th>
-            <th title="Avg Section A5 duration (min)" style="text-align:right;color:#553c9a">Sec A5</th>
-            <th title="Avg Section B duration (min)"  style="text-align:right;color:#553c9a">Sec B</th>
-            <th title="Avg Section C duration (min)"  style="text-align:right;color:#553c9a">Sec C</th>
-            <th title="Avg Section D duration (min)"  style="text-align:right;color:#553c9a">Sec D</th>
-            <th title="Avg Section E duration (min)"  style="text-align:right;color:#553c9a">Sec E</th>
-            <th title="Avg Section F duration (min)"  style="text-align:right;color:#553c9a">Sec F</th>
-            <th title="Avg Section G duration (min)"  style="text-align:right;color:#553c9a">Sec G</th>
-            <th title="Avg Section H duration (min)"  style="text-align:right;color:#553c9a">Sec H</th>
-            <th title="Avg Section I duration (min)"  style="text-align:right;color:#553c9a">Sec I</th>
-            <th title="Avg Section J duration (min)"  style="text-align:right;color:#553c9a">Sec J</th>
-            <th title="Avg Section K duration (min)"  style="text-align:right;color:#553c9a">Sec K</th>
-            <th title="Avg Section L duration (min)"  style="text-align:right;color:#553c9a">Sec L</th>
-            <th title="Avg Section M duration (min)"  style="text-align:right;color:#553c9a">Sec M</th>
-            <th title="Avg Section O duration (min)"  style="text-align:right;color:#553c9a">Sec O</th>
-            <th title="Avg Section P duration (min)"  style="text-align:right;color:#553c9a">Sec P</th>
-            <th title="Avg Section Q duration (min)"  style="text-align:right;color:#553c9a">Sec Q</th>
-            <th title="Avg Section R duration (min)"  style="text-align:right;color:#553c9a">Sec R</th>
-            <th title="Avg Section U duration (min)"  style="text-align:right;color:#553c9a">Sec U</th>
-            <th title="Avg Section T duration (min)"  style="text-align:right;color:#553c9a">Sec T</th>
           </tr>
         </thead>
         <tbody id="enumTbody">
-          <tr><td colspan="28" class="no-data">Loading…</td></tr>
+          <tr><td colspan="5" class="no-data">Loading…</td></tr>
         </tbody>
       </table>
     </div>
@@ -491,34 +452,9 @@
   }
 
   /* ═══════════════════════════════════════════════════
-     SECTION COLUMNS DEFINITION
+     ENUMERATOR TABLE COLUMN COUNT
   ════════════════════════════════════════════════════ */
-  const SEC_COLS = [
-    { key: 'sec_a1_time', label: 'Sec A1' },
-    { key: 'sec_a2_time', label: 'Sec A2' },
-    { key: 'sec_a3_time', label: 'Sec A3' },
-    { key: 'sec_a4_time', label: 'Sec A4' },
-    { key: 'sec_a5_time', label: 'Sec A5' },
-    { key: 'sec_b_time',  label: 'Sec B'  },
-    { key: 'sec_c_time',  label: 'Sec C'  },
-    { key: 'sec_d_time',  label: 'Sec D'  },
-    { key: 'sec_e_time',  label: 'Sec E'  },
-    { key: 'sec_f_time',  label: 'Sec F'  },
-    { key: 'sec_g_time',  label: 'Sec G'  },
-    { key: 'sec_h_time',  label: 'Sec H'  },
-    { key: 'sec_i_time',  label: 'Sec I'  },
-    { key: 'sec_j_time',  label: 'Sec J'  },
-    { key: 'sec_k_time',  label: 'Sec K'  },
-    { key: 'sec_l_time',  label: 'Sec L'  },
-    { key: 'sec_m_time',  label: 'Sec M'  },
-    { key: 'sec_o_time',  label: 'Sec O'  },
-    { key: 'sec_p_time',  label: 'Sec P'  },
-    { key: 'sec_q_time',  label: 'Sec Q'  },
-    { key: 'sec_r_time',  label: 'Sec R'  },
-    { key: 'sec_u_time',  label: 'Sec U'  },
-    { key: 'sec_t_time',  label: 'Sec T'  },
-  ];
-  const N_COLS = 5 + SEC_COLS.length; // 28 total columns
+  const N_COLS = 5; // enumerator, surveys, avg/min/max duration — no per-section timing data in this survey
 
   Chart.register(ChartDataLabels);
 
@@ -903,33 +839,23 @@
     }
 
     // Individual rows
-    const rowsHtml = list.map(e => {
-      const secCells = SEC_COLS.map(sc =>
-        `<td class="sec-val">${fmt(e.secAvgs[sc.key])}</td>`
-      ).join('');
-      return `<tr>
+    const rowsHtml = list.map(e => `<tr>
         <td>${e.enumerator}</td>
         <td style="font-weight:700">${e.surveys}</td>
         <td style="color:var(--blue-dark);font-weight:600">${fmt(e.avgMin)}</td>
         <td style="color:var(--green)">${fmt(e.minMin)}</td>
         <td style="color:var(--red)">${fmt(e.maxMin)}</td>
-        ${secCells}
-      </tr>`;
-    }).join('');
+      </tr>`).join('');
 
     // Overall average row (pinned at bottom)
     let overallHtml = '';
     if (overallRow) {
-      const oSecCells = SEC_COLS.map(sc =>
-        `<td>${fmt(overallRow.secAvgs[sc.key])}</td>`
-      ).join('');
       overallHtml = `<tr class="overall-row">
         <td>⌀ Overall Average</td>
         <td>${overallRow.surveys.toLocaleString()} surveys</td>
         <td>${fmt(overallRow.avgMin)}</td>
         <td>${fmt(overallRow.minMin)}</td>
         <td>${fmt(overallRow.maxMin)}</td>
-        ${oSecCells}
       </tr>`;
     }
 
@@ -958,7 +884,7 @@
 
     /* — Replacements — */
     if (ck.repl) {
-      const replCount = rows.filter(r => String(r[ck.repl] ?? '').trim().toLowerCase() === 'yes').length;
+      const replCount = rows.filter(r => ['yes','true','1'].includes(String(r[ck.repl] ?? '').trim().toLowerCase())).length;
       setText('kRepl', replCount.toLocaleString());
       setText('kReplSub', `of ${total.toLocaleString()} surveys (${pct(replCount, total)}%)`);
       setWidth('kReplBar', replCount, total);
@@ -1019,8 +945,6 @@
       const eMap = {};
       // Grand totals for the Overall Average row
       let grandDurTotal = 0, grandDurCount = 0, grandMin = Infinity, grandMax = -Infinity;
-      const grandSecTotals = Object.fromEntries(SEC_COLS.map(sc => [sc.key, 0]));
-      const grandSecCounts = Object.fromEntries(SEC_COLS.map(sc => [sc.key, 0]));
 
       for (const r of rows) {
         const name = String(r[ck.enum] ?? '').trim();
@@ -1033,8 +957,6 @@
             minMin:     Infinity,
             maxMin:     -Infinity,
             hasDur:     false,
-            secTotals:  Object.fromEntries(SEC_COLS.map(sc => [sc.key, 0])),
-            secCounts:  Object.fromEntries(SEC_COLS.map(sc => [sc.key, 0])),
           };
         }
         eMap[name].surveys++;
@@ -1053,20 +975,6 @@
             grandMax = Math.max(grandMax, dur);
           }
         }
-
-        // Section times — already in minutes in Google Sheet
-        for (const sc of SEC_COLS) {
-          const actualKey = ck.sec[sc.key];
-          if (actualKey) {
-            const sv = parseFloat(r[actualKey]);
-            if (!isNaN(sv) && sv > 0) {
-              eMap[name].secTotals[sc.key] += sv;
-              eMap[name].secCounts[sc.key]++;
-              grandSecTotals[sc.key] += sv;
-              grandSecCounts[sc.key]++;
-            }
-          }
-        }
       }
 
       enumData = Object.values(eMap).map(e => ({
@@ -1076,10 +984,6 @@
         avgMin:     e.hasDur ? e.totalMin / e.surveys : null,
         minMin:     e.hasDur ? e.minMin : null,
         maxMin:     e.hasDur ? e.maxMin : null,
-        secAvgs:    Object.fromEntries(SEC_COLS.map(sc => [
-          sc.key,
-          e.secCounts[sc.key] > 0 ? e.secTotals[sc.key] / e.secCounts[sc.key] : null
-        ])),
       }));
 
       // Overall average (weighted — across all individual surveys, not mean-of-means)
@@ -1096,10 +1000,6 @@
         avgMin:  overallAvgMin,
         minMin:  grandDurCount > 0 ? grandMin : null,
         maxMin:  grandDurCount > 0 ? grandMax : null,
-        secAvgs: Object.fromEntries(SEC_COLS.map(sc => [
-          sc.key,
-          grandSecCounts[sc.key] > 0 ? grandSecTotals[sc.key] / grandSecCounts[sc.key] : null
-        ])),
       };
     } else {
       enumData   = [];
@@ -1172,24 +1072,23 @@
 
       const keys = Object.keys(rows[0]);
 
-      // Build column key map (case-insensitive)
+      // Build column key map (case-insensitive) — matches the BNR sheet's actual headers
       colKeys = {
-        unique:   findCol(keys, 'uniqueid'),
-        province: findCol(keys, 'mob_province'),
-        district: findCol(keys, 'mob_district'),
-        sector:   findCol(keys, 'mob_sector'),
-        village:  findCol(keys, 'mob_village'),
-        mob:         findCol(keys, 'a4_02'),
-        smart:       findCol(keys, 'a4_03'),
-        date:        findCol(keys, 'submissiondate') || findCol(keys, 'submission_date_only'),
+        unique:   findCol(keys, 'submission_id'),
+        province: findCol(keys, 'province'),
+        district: findCol(keys, 'district'),
+        sector:   findCol(keys, 'sector'),
+        village:  findCol(keys, 'village'),
+        mob:         findCol(keys, 'own_mobile_money'),
+        smart:       findCol(keys, 'smartphone_access'),
+        date:        findCol(keys, 'interview_date'),
         strata:   findCol(keys, 'strata'),
-        enum:     findCol(keys, 'enumerator'),
-        dur:      findCol(keys, 'total_duration_min'),
-        repl:     findCol(keys, 'youth_replacement'),
-        sec:      Object.fromEntries(SEC_COLS.map(sc => [sc.key, findCol(keys, sc.key)])),
+        enum:     findCol(keys, 'enumerator_name'),
+        dur:      findCol(keys, 'duration_minutes'),
+        repl:     findCol(keys, 'replacement_flag'),
       };
 
-      if (!colKeys.unique) throw new Error(`"uniqueid" column not found. Columns: ${keys.join(', ')}`);
+      if (!colKeys.unique) throw new Error(`"submission_id" column not found. Columns: ${keys.join(', ')}`);
 
       allRows = rows;
 
