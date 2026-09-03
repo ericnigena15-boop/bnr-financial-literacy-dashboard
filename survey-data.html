@@ -370,6 +370,66 @@
     </div>
   </div>
 
+  <!-- Financial literacy indicators — 3-column row -->
+  <div class="dash-row-3">
+    <div class="dash-card">
+      <div class="dash-card-title">🛡️ Insurance Coverage <span class="dash-card-sub">(insurance_coverage)</span></div>
+      <div style="display:flex;justify-content:space-between;align-items:flex-start;margin-bottom:14px;">
+        <div>
+          <div class="yn-label yes">Yes</div>
+          <div style="font-size:1.5rem;font-weight:800;color:#276749;line-height:1.2" id="ins-yes-count">—</div>
+          <div class="yn-pct" id="ins-yes-pct"></div>
+        </div>
+        <div style="text-align:right">
+          <div class="yn-label no">No</div>
+          <div style="font-size:1.5rem;font-weight:800;color:#9b2c2c;line-height:1.2" id="ins-no-count">—</div>
+          <div class="yn-pct" id="ins-no-pct"></div>
+        </div>
+      </div>
+      <div style="height:90px;position:relative;">
+        <canvas id="insChart"></canvas>
+      </div>
+    </div>
+
+    <div class="dash-card">
+      <div class="dash-card-title">👴 Pension Coverage <span class="dash-card-sub">(pension_coverage)</span></div>
+      <div style="display:flex;justify-content:space-between;align-items:flex-start;margin-bottom:14px;">
+        <div>
+          <div class="yn-label yes">Yes</div>
+          <div style="font-size:1.5rem;font-weight:800;color:#276749;line-height:1.2" id="pen-yes-count">—</div>
+          <div class="yn-pct" id="pen-yes-pct"></div>
+        </div>
+        <div style="text-align:right">
+          <div class="yn-label no">No</div>
+          <div style="font-size:1.5rem;font-weight:800;color:#9b2c2c;line-height:1.2" id="pen-no-count">—</div>
+          <div class="yn-pct" id="pen-no-pct"></div>
+        </div>
+      </div>
+      <div style="height:90px;position:relative;">
+        <canvas id="penChart"></canvas>
+      </div>
+    </div>
+
+    <div class="dash-card">
+      <div class="dash-card-title">🎓 Financial Training <span class="dash-card-sub">(financial_training)</span></div>
+      <div style="display:flex;justify-content:space-between;align-items:flex-start;margin-bottom:14px;">
+        <div>
+          <div class="yn-label yes">Yes</div>
+          <div style="font-size:1.5rem;font-weight:800;color:#276749;line-height:1.2" id="fin-yes-count">—</div>
+          <div class="yn-pct" id="fin-yes-pct"></div>
+        </div>
+        <div style="text-align:right">
+          <div class="yn-label no">No</div>
+          <div style="font-size:1.5rem;font-weight:800;color:#9b2c2c;line-height:1.2" id="fin-no-count">—</div>
+          <div class="yn-pct" id="fin-no-pct"></div>
+        </div>
+      </div>
+      <div style="height:90px;position:relative;">
+        <canvas id="finChart"></canvas>
+      </div>
+    </div>
+  </div>
+
   <!-- Daily submissions chart — hidden for admin/supervisor role -->
   <div class="dash-card dash-row-1" id="dailySection">
     <div class="dash-card-title">
@@ -477,7 +537,7 @@
   const dataSection = document.getElementById('dataSection');
 
   let dailyChart   = null;
-  let phoneCharts  = { mob: null, smart: null };
+  let phoneCharts  = { mob: null, smart: null, ins: null, pen: null, fin: null };
   let allRows      = [];    // full dataset from API
   let colKeys      = {};    // column key map
   let villageData  = [];
@@ -937,6 +997,9 @@
     renderStrata(rows, ck.strata);
     renderPhone('mob',   rows, ck.mob);
     renderPhone('smart', rows, ck.smart);
+    renderPhone('ins',   rows, ck.insurance);
+    renderPhone('pen',   rows, ck.pension);
+    renderPhone('fin',   rows, ck.training);
     renderDaily(rows, ck.date);
     renderVillageTable();
 
@@ -1081,6 +1144,9 @@
         village:  findCol(keys, 'village'),
         mob:         findCol(keys, 'own_mobile_money'),
         smart:       findCol(keys, 'smartphone_access'),
+        insurance:   findCol(keys, 'insurance_coverage'),
+        pension:     findCol(keys, 'pension_coverage'),
+        training:    findCol(keys, 'financial_training'),
         date:        findCol(keys, 'interview_date'),
         strata:   findCol(keys, 'strata'),
         enum:     findCol(keys, 'enumerator_name'),
