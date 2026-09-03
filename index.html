@@ -6,9 +6,9 @@
   <title>BNR Financial Literacy Survey Dashboard</title>
   <style>
     :root {
-      --blue:       #4299e1;
-      --blue-dark:  #2b6cb0;
-      --blue-light: #ebf8ff;
+      --blue:       #6B3A24;
+      --blue-dark:  #4A2414;
+      --blue-light: #F3E4D0;
       --gray:       #718096;
       --border:     #e2e8f0;
       --bg:         #edf2f7;
@@ -29,7 +29,7 @@
     .hdr-right { display: flex; align-items: center; gap: 12px; }
     #roleTag { font-size: 0.72rem; font-weight: 700; padding: 3px 9px; border-radius: 12px; white-space: nowrap; }
     .role-client { background: #c6f6d5; color: #276749; }
-    .role-admin  { background: #bee3f8; color: #2c5282; }
+    .role-admin  { background: var(--blue-light); color: var(--blue-dark); }
     .btn-logout {
       padding: 5px 12px; background: rgba(255,255,255,0.12);
       border: 1px solid rgba(255,255,255,0.3); color: rgba(255,255,255,0.85);
@@ -65,7 +65,7 @@
       font-size: 0.95rem; color: #2d3748; outline: none;
       transition: border-color 0.18s, box-shadow 0.18s;
     }
-    .login-field input:focus { border-color: var(--blue); box-shadow: 0 0 0 3px rgba(66,153,225,0.18); }
+    .login-field input:focus { border-color: var(--blue); box-shadow: 0 0 0 3px rgba(107,58,36,0.18); }
     .btn-login {
       width: 100%; padding: 11px; background: var(--blue-dark);
       color: #fff; border: none; border-radius: 8px;
