@@ -527,6 +527,18 @@
   const TARGET_VILLAGE = 4;      // respondents per village
   const TOTAL_VILLAGES = 1252;   // 313 sectors × 4 villages/sector
   const STRATA_COLORS  = ['#4299e1','#805ad5','#ed64a6','#f6ad55'];
+  // Display order: paired by age bracket, not grouped by sex. Falls back to
+  // alphabetical for any label that doesn't match one of these exactly.
+  const STRATA_ORDER = ['Men 16–30', 'Women 16–30', 'Men 31 and above', 'Women 31 and above'];
+  function sortStrata(arr) {
+    return arr.slice().sort((a, b) => {
+      const ia = STRATA_ORDER.indexOf(a), ib = STRATA_ORDER.indexOf(b);
+      if (ia !== -1 && ib !== -1) return ia - ib;
+      if (ia !== -1) return -1;
+      if (ib !== -1) return 1;
+      return a.localeCompare(b);
+    });
+  }
 
   /* ═══════════════════════════════════════════════════
      STATE
@@ -657,7 +669,7 @@
     const strataSel = document.getElementById('fStrata');
     const curStrata = strataSel.value;
     strataSel.innerHTML = '<option value="">All Strata</option>' +
-      uniq(rows.map(r => String(r[ck.strata] ?? '').trim()))
+      sortStrata([...new Set(rows.map(r => String(r[ck.strata] ?? '').trim()).filter(Boolean))])
         .map(v => `<option value="${v}"${v === curStrata ? ' selected' : ''}>${v}</option>`).join('');
   }
 
@@ -675,7 +687,7 @@
       const s = String(r[strataKey] ?? '').trim();
       if (s) counts[s] = (counts[s] || 0) + 1;
     }
-    const entries = Object.entries(counts).sort((a, b) => a[0].localeCompare(b[0]));
+    const entries = sortStrata(Object.keys(counts)).map(label => [label, counts[label]]);
     container.innerHTML = entries.length
       ? entries.map(([label, count], i) => {
           const p = Math.min(100, Math.round(count / TARGET_STRATA * 100));
@@ -975,7 +987,7 @@
         vMap[mapKey].count++;
         if (sv) vMap[mapKey].strataCounts[sv] = (vMap[mapKey].strataCounts[sv] || 0) + 1;
       }
-      strataList  = Array.from(allStrata).sort();
+      strataList  = sortStrata(Array.from(allStrata));
       villageData = Object.values(vMap);
       villageData.forEach(v => {
         v.totalStrata    = strataList.length;
