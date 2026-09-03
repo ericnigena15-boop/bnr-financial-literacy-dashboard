@@ -6,6 +6,10 @@
   <title>BNR Financial Literacy Survey Data</title>
   <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.0/dist/chart.umd.min.js"></script>
   <script src="https://cdn.jsdelivr.net/npm/chartjs-plugin-datalabels@2.2.0/dist/chartjs-plugin-datalabels.min.js"></script>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Raleway:wght@400;700;800&display=swap" rel="stylesheet">
+  <link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:opsz,wght,FILL,GRAD@24,400,0,0" rel="stylesheet">
   <style>
     :root {
       --blue:       #6B3A24;
@@ -89,9 +93,9 @@
     .kpi-card.green  { border-top-color: var(--green); }
     .kpi-card.yellow { border-top-color: var(--yellow); }
     .kpi-card.purple { border-top-color: var(--purple); }
-    .kpi-label { font-size: 0.67rem; font-weight: 700; text-transform: uppercase; letter-spacing: 0.08em; color: var(--gray); margin-bottom: 5px; }
-    .kpi-value { font-size: 1.9rem; font-weight: 800; color: #1a202c; line-height: 1; }
-    .kpi-sub   { font-size: 0.73rem; color: var(--gray); margin-top: 4px; }
+    .kpi-label { font-family: 'Raleway', sans-serif; font-size: 0.78rem; font-weight: 800; text-transform: uppercase; letter-spacing: 0.08em; color: var(--gray); margin-bottom: 5px; }
+    .kpi-value { font-family: 'Raleway', sans-serif; font-size: 2.3rem; font-weight: 800; color: #1a202c; line-height: 1; }
+    .kpi-sub   { font-family: 'Raleway', sans-serif; font-size: 0.85rem; font-weight: 700; color: var(--gray); margin-top: 4px; }
     .kpi-track { height: 4px; background: #e2e8f0; border-radius: 2px; margin-top: 9px; overflow: hidden; }
     .kpi-fill  { height: 100%; border-radius: 2px; background: var(--blue); transition: width 0.7s ease; }
     .kpi-card.green  .kpi-fill { background: var(--green); }
@@ -109,19 +113,30 @@
       padding: 20px 22px; box-shadow: 0 1px 5px rgba(0,0,0,0.07);
     }
     .dash-card-title {
+      font-family: 'Raleway', sans-serif;
       font-size: 0.87rem; font-weight: 700; color: #1a202c;
       margin-bottom: 16px;
-      display: flex; align-items: baseline; justify-content: space-between; gap: 8px;
+      text-align: center;
     }
     .dash-card-sub { font-size: 0.73rem; font-weight: 400; color: var(--gray); }
+    .material-symbols-outlined {
+      font-family: 'Material Symbols Outlined'; font-weight: normal; font-style: normal;
+      line-height: 1; letter-spacing: normal; text-transform: none;
+      display: inline-block; white-space: nowrap; word-wrap: normal; direction: ltr;
+      vertical-align: middle;
+    }
+    .dash-card-hero { text-align: center; margin-bottom: 14px; }
+    .dash-card-hero img { width: 100px; height: 100px; object-fit: contain; border-radius: 16px; }
+    .dash-card-hero .material-symbols-outlined { font-size: 90px; color: var(--blue); }
+    .filter-icon { font-size: 20px; margin-right: 3px; color: var(--blue); }
 
     /* ── Strata bars ── */
     .strata-list { display: flex; flex-direction: column; gap: 14px; }
     .strata-row-hdr { display: flex; justify-content: space-between; margin-bottom: 4px; align-items: baseline; }
     .strata-name-lbl { font-size: 0.82rem; font-weight: 700; }
     .strata-cnt { font-size: 0.79rem; color: var(--gray); }
-    .bar-track { height: 11px; background: #e2e8f0; border-radius: 6px; overflow: hidden; }
-    .bar-fill  { height: 100%; border-radius: 6px; transition: width 0.7s ease; }
+    .bar-track { height: 4px; background: #e2e8f0; border-radius: 2px; overflow: hidden; }
+    .bar-fill  { height: 100%; border-radius: 2px; transition: width 0.7s ease; }
 
     /* ── Phone ownership ── */
     .phone-list { display: flex; flex-direction: column; gap: 20px; }
@@ -134,12 +149,12 @@
     .yn-header { display: flex; justify-content: space-between; align-items: baseline; margin-bottom: 4px; }
     .yn-label { font-size: 0.8rem; font-weight: 700; }
     .yn-label.yes { color: #276749; }
-    .yn-label.no  { color: #9b2c2c; }
+    .yn-label.no  { color: var(--gray); }
     .yn-counts { font-size: 0.76rem; color: var(--gray); }
-    .yn-bar-track { height: 10px; background: #e2e8f0; border-radius: 5px; overflow: hidden; }
-    .yn-bar-fill { height: 100%; border-radius: 5px; transition: width 0.7s ease; }
+    .yn-bar-track { height: 8px; background: #e2e8f0; border-radius: 4px; overflow: hidden; }
+    .yn-bar-fill { height: 100%; border-radius: 4px; transition: width 0.7s ease; }
     .yn-bar-fill.yes { background: var(--green); }
-    .yn-bar-fill.no  { background: var(--red); }
+    .yn-bar-fill.no  { background: #a0aec0; }
     .yn-pct { font-size: 0.71rem; color: var(--gray); margin-top: 2px; text-align: right; }
     .phone-divider { border: none; border-top: 1.5px solid var(--border); margin: 4px 0 4px; }
 
@@ -258,11 +273,11 @@
 
   <!-- Date filter bar -->
   <div class="filter-bar">
-    <span class="filter-label">📅 Date:</span>
+    <span class="filter-label"><span class="material-symbols-outlined filter-icon">calendar_month</span>Date:</span>
     <select id="dateFilter" class="filter-select" style="min-width:130px">
       <option value="">All dates</option>
     </select>
-    <span class="filter-label">📍 Province:</span>
+    <span class="filter-label"><span class="material-symbols-outlined filter-icon">location_on</span>Province:</span>
     <select id="fProvince" class="filter-select" style="min-width:130px">
       <option value="">All</option>
     </select>
@@ -275,7 +290,7 @@
     <select id="fVillage" class="filter-select" style="min-width:130px" disabled>
       <option value="">All Villages</option>
     </select>
-    <span class="filter-label">👥 Strata:</span>
+    <span class="filter-label"><span class="material-symbols-outlined filter-icon">group</span>Strata:</span>
     <select id="fStrata" class="filter-select" style="min-width:140px">
       <option value="">All Strata</option>
     </select>
@@ -331,8 +346,8 @@
       </div>
     </div>
 
-    <div class="dash-card">
-      <div class="dash-card-title">💰 Mobile Money Ownership <span class="dash-card-sub">(own_mobile_money)</span></div>
+    <div class="dash-card" style="background:#F3EFE6">
+      <div class="dash-card-title">Mobile Money Ownership</div>
       <div style="display:flex;justify-content:space-between;align-items:flex-start;margin-bottom:14px;">
         <div>
           <div class="yn-label yes">Yes</div>
@@ -341,17 +356,18 @@
         </div>
         <div style="text-align:right">
           <div class="yn-label no">No</div>
-          <div style="font-size:1.5rem;font-weight:800;color:#9b2c2c;line-height:1.2" id="mob-no-count">—</div>
+          <div style="font-size:1.5rem;font-weight:800;color:#4a5568;line-height:1.2" id="mob-no-count">—</div>
           <div class="yn-pct" id="mob-no-pct"></div>
         </div>
       </div>
-      <div style="height:90px;position:relative;">
+      <div class="dash-card-hero"><img src="Momo.png" alt="" /></div>
+      <div style="height:55px;position:relative;">
         <canvas id="mobChart"></canvas>
       </div>
     </div>
 
-    <div class="dash-card">
-      <div class="dash-card-title">🤳 Smartphone Access <span class="dash-card-sub">(smartphone_access)</span></div>
+    <div class="dash-card" style="background:#ECE8E0">
+      <div class="dash-card-title">Smartphone Access</div>
       <div style="display:flex;justify-content:space-between;align-items:flex-start;margin-bottom:14px;">
         <div>
           <div class="yn-label yes">Yes</div>
@@ -360,11 +376,12 @@
         </div>
         <div style="text-align:right">
           <div class="yn-label no">No</div>
-          <div style="font-size:1.5rem;font-weight:800;color:#9b2c2c;line-height:1.2" id="smart-no-count">—</div>
+          <div style="font-size:1.5rem;font-weight:800;color:#4a5568;line-height:1.2" id="smart-no-count">—</div>
           <div class="yn-pct" id="smart-no-pct"></div>
         </div>
       </div>
-      <div style="height:90px;position:relative;">
+      <div class="dash-card-hero"><img src="black-white-image-person-holding-phone.avif" alt="" /></div>
+      <div style="height:55px;position:relative;">
         <canvas id="smartChart"></canvas>
       </div>
     </div>
@@ -372,8 +389,8 @@
 
   <!-- Financial literacy indicators — 3-column row -->
   <div class="dash-row-3">
-    <div class="dash-card">
-      <div class="dash-card-title">🛡️ Insurance Coverage <span class="dash-card-sub">(insurance_coverage)</span></div>
+    <div class="dash-card" style="background:#E9EDEC">
+      <div class="dash-card-title">Insurance Coverage</div>
       <div style="display:flex;justify-content:space-between;align-items:flex-start;margin-bottom:14px;">
         <div>
           <div class="yn-label yes">Yes</div>
@@ -382,17 +399,18 @@
         </div>
         <div style="text-align:right">
           <div class="yn-label no">No</div>
-          <div style="font-size:1.5rem;font-weight:800;color:#9b2c2c;line-height:1.2" id="ins-no-count">—</div>
+          <div style="font-size:1.5rem;font-weight:800;color:#4a5568;line-height:1.2" id="ins-no-count">—</div>
           <div class="yn-pct" id="ins-no-pct"></div>
         </div>
       </div>
-      <div style="height:90px;position:relative;">
+      <div class="dash-card-hero"><img src="insurance-icon-10.png" alt="" /></div>
+      <div style="height:55px;position:relative;">
         <canvas id="insChart"></canvas>
       </div>
     </div>
 
-    <div class="dash-card">
-      <div class="dash-card-title">👴 Pension Coverage <span class="dash-card-sub">(pension_coverage)</span></div>
+    <div class="dash-card" style="background:#E3EAEB">
+      <div class="dash-card-title">Pension Coverage</div>
       <div style="display:flex;justify-content:space-between;align-items:flex-start;margin-bottom:14px;">
         <div>
           <div class="yn-label yes">Yes</div>
@@ -401,17 +419,18 @@
         </div>
         <div style="text-align:right">
           <div class="yn-label no">No</div>
-          <div style="font-size:1.5rem;font-weight:800;color:#9b2c2c;line-height:1.2" id="pen-no-count">—</div>
+          <div style="font-size:1.5rem;font-weight:800;color:#4a5568;line-height:1.2" id="pen-no-count">—</div>
           <div class="yn-pct" id="pen-no-pct"></div>
         </div>
       </div>
-      <div style="height:90px;position:relative;">
+      <div class="dash-card-hero"><span class="material-symbols-outlined">elderly</span></div>
+      <div style="height:55px;position:relative;">
         <canvas id="penChart"></canvas>
       </div>
     </div>
 
-    <div class="dash-card">
-      <div class="dash-card-title">🎓 Financial Training <span class="dash-card-sub">(financial_training)</span></div>
+    <div class="dash-card" style="background:#DCE6E8">
+      <div class="dash-card-title">Financial Training</div>
       <div style="display:flex;justify-content:space-between;align-items:flex-start;margin-bottom:14px;">
         <div>
           <div class="yn-label yes">Yes</div>
@@ -420,11 +439,12 @@
         </div>
         <div style="text-align:right">
           <div class="yn-label no">No</div>
-          <div style="font-size:1.5rem;font-weight:800;color:#9b2c2c;line-height:1.2" id="fin-no-count">—</div>
+          <div style="font-size:1.5rem;font-weight:800;color:#4a5568;line-height:1.2" id="fin-no-count">—</div>
           <div class="yn-pct" id="fin-no-pct"></div>
         </div>
       </div>
-      <div style="height:90px;position:relative;">
+      <div class="dash-card-hero"><img src="ChatGPT%20Image%20Sep%204%2C%202026%2C%2001_25_15%20AM.png" alt="" /></div>
+      <div style="height:55px;position:relative;">
         <canvas id="finChart"></canvas>
       </div>
     </div>
@@ -737,8 +757,8 @@
         data: {
           labels: [''],
           datasets: [
-            { label: 'Yes', data: [yes], backgroundColor: '#48bb78', borderSkipped: false, borderRadius: 4 },
-            { label: 'No',  data: [no],  backgroundColor: '#fc8181', borderSkipped: false, borderRadius: 4 }
+            { label: 'Yes', data: [yes], backgroundColor: '#48bb78', borderSkipped: false, borderRadius: 4, barThickness: 8 },
+            { label: 'No',  data: [no],  backgroundColor: '#a0aec0', borderSkipped: false, borderRadius: 4, barThickness: 8 }
           ]
         },
         options: {

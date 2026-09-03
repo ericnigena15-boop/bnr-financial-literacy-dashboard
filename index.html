@@ -4,6 +4,9 @@
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <title>BNR Financial Literacy Survey Dashboard</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Raleway:wght@400;700;800&display=swap" rel="stylesheet">
   <style>
     :root {
       --blue:       #6B3A24;
@@ -19,14 +22,15 @@
     /* ── Header ── */
     .app-header {
       background: var(--blue-dark); color: #fff;
-      padding: 0 24px; display: flex; align-items: center;
-      justify-content: space-between; gap: 16px; flex-shrink: 0;
+      padding: 0 24px; display: grid;
+      grid-template-columns: 1fr auto 1fr;
+      align-items: center; gap: 16px; flex-shrink: 0;
       box-shadow: 0 2px 10px rgba(0,0,0,0.25); min-height: 56px;
     }
     .app-brand { display: flex; align-items: center; gap: 10px; padding: 10px 0; }
     .brand-logo { height: 40px; width: auto; display: block; object-fit: contain; }
-    .app-brand h1 { font-size: 1.05rem; font-weight: 700; white-space: nowrap; }
-    .hdr-right { display: flex; align-items: center; gap: 12px; }
+    .app-header h1 { font-family: 'Raleway', sans-serif; font-size: 2.1rem; font-weight: 800; white-space: nowrap; text-align: center; }
+    .hdr-right { display: flex; align-items: center; gap: 12px; justify-self: end; }
     #roleTag { font-size: 0.72rem; font-weight: 700; padding: 3px 9px; border-radius: 12px; white-space: nowrap; }
     .role-client { background: #c6f6d5; color: #276749; }
     .role-admin  { background: var(--blue-light); color: var(--blue-dark); }
@@ -54,7 +58,14 @@
       padding: 40px 36px; width: 100%; max-width: 380px;
       display: flex; flex-direction: column; align-items: center; gap: 0;
     }
-    .login-logo  { font-size: 2.4rem; margin-bottom: 10px; }
+    .login-logos { display: flex; align-items: center; gap: 16px; margin-bottom: 14px; }
+    .login-logo  {
+      width: 84px; height: 84px; border-radius: 50%;
+      background: var(--blue-dark); display: flex;
+      align-items: center; justify-content: center;
+    }
+    .login-logo img { width: 60px; height: 60px; object-fit: contain; }
+    .login-logo-vanguard { width: 68px; height: 68px; object-fit: contain; }
     .login-title { font-size: 1.2rem; font-weight: 800; color: #1a202c; margin-bottom: 4px; }
     .login-sub   { font-size: 0.82rem; color: var(--gray); margin-bottom: 24px; text-align: center; }
     .login-field { width: 100%; margin-bottom: 14px; }
@@ -82,7 +93,10 @@
 <!-- Login modal -->
 <div id="loginModal">
   <div class="login-card">
-    <div class="login-logo">🔐</div>
+    <div class="login-logos">
+      <div class="login-logo"><img src="bnr-logo.png" alt="National Bank of Rwanda" /></div>
+      <img class="login-logo-vanguard" src="Vanguard%20Economics%20Logo.png" alt="Vanguard Economics" />
+    </div>
     <div class="login-title">Financial Literacy Survey Dashboard</div>
     <div class="login-sub">National Bank of Rwanda — Enter your access code to continue</div>
     <div class="login-field">
@@ -97,9 +111,9 @@
 <!-- Header -->
 <header class="app-header">
   <div class="app-brand">
-    <img class="brand-logo" src="vanguard-economics-logo.svg" alt="Vanguard Economics" />
-    <h1>Financial Literacy &amp; Well-Being Survey 2026</h1>
+    <img class="brand-logo" src="bnr-logo.png" alt="National Bank of Rwanda" />
   </div>
+  <h1>Financial Literacy &amp; Well-Being Survey 2026</h1>
   <div class="hdr-right" id="hdrAuth" style="display:none">
     <span id="roleTag"></span>
     <button class="btn-logout" id="logoutBtn">Sign Out</button>
