@@ -77,7 +77,6 @@
       min-width: 180px; transition: border-color 0.15s; cursor: pointer; background: var(--white);
     }
     .filter-select:focus { border-color: var(--blue); }
-    .filter-info { font-size: 0.78rem; color: var(--gray); margin-left: auto; }
 
     /* ── Qualitative / Quantitative tabs (internal/admin only) ── */
     .qual-tabs {
@@ -319,7 +318,6 @@
       <option value="">All Strata</option>
     </select>
     <button id="btnClearFilters" style="padding:6px 12px;border:1.5px solid var(--border);border-radius:7px;background:#f7fafc;font-size:0.82rem;font-weight:600;color:var(--gray);cursor:pointer;">✕ Clear</button>
-    <span class="filter-info" id="filterInfo"></span>
     <button class="btn-refresh" id="btnRefresh" disabled>↻ Refresh</button>
   </div>
 
@@ -335,11 +333,10 @@
     <div class="kpi-card green">
       <div class="kpi-label">Completion Rate</div>
       <div class="kpi-value" id="kRate">—</div>
-      <div class="kpi-sub" id="kRateSub">vs 5,008 target</div>
       <div class="kpi-track"><div class="kpi-fill" id="kRateBar" style="width:0"></div></div>
     </div>
     <div class="kpi-card yellow">
-      <div class="kpi-label">Villages at Target</div>
+      <div class="kpi-label">Villages Completed</div>
       <div class="kpi-value" id="kVill">—</div>
       <div class="kpi-sub" id="kVillSub">of 1,252 villages</div>
       <div class="kpi-track"><div class="kpi-fill" id="kVillBar" style="width:0"></div></div>
@@ -350,7 +347,7 @@
       <div class="kpi-sub" id="kAvgDurSub">min / survey (all enumerators)</div>
       <div class="kpi-track"><div class="kpi-fill" id="kAvgDurBar" style="width:0"></div></div>
     </div>
-    <div class="kpi-card" style="border-top-color:var(--orange)">
+    <div class="kpi-card" id="replCard" style="border-top-color:var(--orange)">
       <div class="kpi-label">Replacements Done</div>
       <div class="kpi-value" id="kRepl" style="color:var(--orange)">—</div>
       <div class="kpi-sub" id="kReplSub">of total surveys</div>
@@ -369,7 +366,6 @@
     <div class="dash-card">
       <div class="dash-card-title">
         Progress by Strata (Age &amp; Sex)
-        <span class="dash-card-sub">target 1,252 each</span>
       </div>
       <div class="strata-list" id="strataList">
         <div style="color:var(--gray);font-size:0.85rem">Loading…</div>
@@ -482,7 +478,6 @@
   <div class="dash-card dash-row-1">
     <div class="dash-card-title">
       Village Progress
-      <span class="dash-card-sub" id="villageCountLbl">0 / 1,252 at target</span>
     </div>
     <div class="tbl-topbar">
       <input class="tbl-search" type="search" id="villageSearch" placeholder="Search village, sector…" />
@@ -577,7 +572,8 @@
   function applyRole(role) {
     currentRole = role;
     const isAdmin = role === 'admin';
-    document.getElementById('enumSection').style.display  = isAdmin ? '' : 'none';
+    document.getElementById('enumSection').style.display = isAdmin ? '' : 'none';
+    document.getElementById('replCard').style.display    = isAdmin ? '' : 'none';
   }
 
   /* ═══════════════════════════════════════════════════
@@ -693,7 +689,6 @@
 
   function applyFilters() {
     const filtered = getFiltered();
-    setText('filterInfo', `${filtered.length.toLocaleString()} of ${allRows.length.toLocaleString()} rows`);
     renderAll(filtered);
   }
 
@@ -966,7 +961,6 @@
     });
 
     const atTarget = villageData.filter(v => v.status === 'complete').length;
-    setText('villageCountLbl', `${atTarget} / ${villageData.length} at target`);
     setText('tblInfo', `${list.length} village${list.length !== 1 ? 's' : ''} shown`);
 
     const tbody = document.getElementById('villTbody');
@@ -1071,7 +1065,6 @@
     setText('kTotalSub', `of ${TARGET_TOTAL.toLocaleString()} target — ${pct(total, TARGET_TOTAL)}%`);
     setWidth('kTotalBar', total, TARGET_TOTAL);
     setText('kRate', `${pct(total, TARGET_TOTAL)}%`);
-    setText('kRateSub', `${total.toLocaleString()} of ${TARGET_TOTAL.toLocaleString()} surveys`);
     setWidth('kRateBar', total, TARGET_TOTAL);
 
     /* — Replacements — */
@@ -1184,9 +1177,7 @@
       // Overall average (weighted — across all individual surveys, not mean-of-means)
       const overallAvgMin = grandDurCount > 0 ? grandDurTotal / grandDurCount : null;
       setText('kAvgDur', overallAvgMin != null ? overallAvgMin.toFixed(1) : '—');
-      setText('kAvgDurSub', grandDurCount > 0
-        ? `min / survey · ${grandDurCount.toLocaleString()} surveys timed`
-        : 'no duration data');
+      setText('kAvgDurSub', grandDurCount > 0 ? 'min / survey' : 'no duration data');
       // Bar: reference 120 min as "full" for the progress bar
       setWidth('kAvgDurBar', overallAvgMin ?? 0, 120);
 
@@ -1392,7 +1383,6 @@
 
       populateDateFilter(rows, colKeys.date);
       populateLocationFilters(rows);
-      setText('filterInfo', `All ${rows.length.toLocaleString()} rows`);
 
       renderAll(rows);
 
