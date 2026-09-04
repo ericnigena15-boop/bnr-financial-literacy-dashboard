@@ -97,7 +97,7 @@
     .data-section.show { display: block; }
 
     /* ── KPI grid ── */
-    .kpi-grid { display: grid; grid-template-columns: repeat(5,1fr); gap: 14px; margin-bottom: 16px; }
+    .kpi-grid { display: grid; grid-template-columns: repeat(4,1fr); gap: 14px; margin-bottom: 16px; }
     .kpi-card {
       background: var(--white); border-radius: 10px;
       padding: 16px 18px 14px; box-shadow: 0 1px 5px rgba(0,0,0,0.07);
@@ -347,12 +347,6 @@
       <div class="kpi-sub" id="kAvgDurSub">min / survey (all enumerators)</div>
       <div class="kpi-track"><div class="kpi-fill" id="kAvgDurBar" style="width:0"></div></div>
     </div>
-    <div class="kpi-card" id="replCard" style="border-top-color:var(--orange)">
-      <div class="kpi-label">Replacements Done</div>
-      <div class="kpi-value" id="kRepl" style="color:var(--orange)">—</div>
-      <div class="kpi-sub" id="kReplSub">of total surveys</div>
-      <div class="kpi-track"><div class="kpi-fill" id="kReplBar" style="width:0;background:var(--orange)"></div></div>
-    </div>
   </div>
 
   <!-- Shared key for all Yes/No cards below -->
@@ -573,7 +567,6 @@
     currentRole = role;
     const isAdmin = role === 'admin';
     document.getElementById('enumSection').style.display = isAdmin ? '' : 'none';
-    document.getElementById('replCard').style.display    = isAdmin ? '' : 'none';
   }
 
   /* ═══════════════════════════════════════════════════
@@ -1067,14 +1060,6 @@
     setText('kRate', `${pct(total, TARGET_TOTAL)}%`);
     setWidth('kRateBar', total, TARGET_TOTAL);
 
-    /* — Replacements — */
-    if (ck.repl) {
-      const replCount = rows.filter(r => ['yes','true','1'].includes(String(r[ck.repl] ?? '').trim().toLowerCase())).length;
-      setText('kRepl', replCount.toLocaleString());
-      setText('kReplSub', `of ${total.toLocaleString()} surveys (${pct(replCount, total)}%)`);
-      setWidth('kReplBar', replCount, total);
-    }
-
     /* — Village aggregation — */
     if (ck.village) {
       const vMap = {};
@@ -1374,7 +1359,6 @@
         strata:   findCol(keys, 'strata'),
         enum:     findCol(keys, 'enumerator_name'),
         dur:      findCol(keys, 'duration_minutes'),
-        repl:     findCol(keys, 'replacement_flag'),
       };
 
       if (!colKeys.unique) throw new Error(`"submission_id" column not found. Columns: ${keys.join(', ')}`);
