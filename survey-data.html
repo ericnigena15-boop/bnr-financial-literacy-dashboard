@@ -79,6 +79,16 @@
     .filter-select:focus { border-color: var(--blue); }
     .filter-info { font-size: 0.78rem; color: var(--gray); margin-left: auto; }
 
+    /* ── Qualitative / Quantitative tabs (internal/admin only) ── */
+    .qual-tabs { display: flex; gap: 8px; margin-bottom: 14px; }
+    .qtab-btn {
+      padding: 8px 16px; border: 1.5px solid var(--border); border-radius: 8px;
+      background: var(--white); color: #4a5568; font-family: 'Raleway', sans-serif;
+      font-size: 0.84rem; font-weight: 700; cursor: pointer; transition: all 0.15s;
+    }
+    .qtab-btn:hover { border-color: var(--blue); }
+    .qtab-btn.active { background: var(--blue); color: #fff; border-color: var(--blue); }
+
     /* ── Sections ── */
     .data-section { display: none; }
     .data-section.show { display: block; }
@@ -268,6 +278,11 @@
 <div id="banner" class="loading">
   <div class="spinner"></div>
   <span id="bannerText">Loading survey data…</span>
+</div>
+
+<div class="qual-tabs" id="qualTabs" style="display:none;">
+  <button class="qtab-btn active" id="tabQuantBtn">Quantitative</button>
+  <button class="qtab-btn" id="tabQualBtn">Qualitative</button>
 </div>
 
 <div id="dataSection" class="data-section">
@@ -515,6 +530,31 @@
 
 </div><!-- /dataSection -->
 
+<div id="qualSection" class="data-section">
+  <div class="kpi-grid" style="grid-template-columns:repeat(2,1fr);max-width:560px;">
+    <div class="kpi-card">
+      <div class="kpi-label">Key Informant Interviews</div>
+      <div class="kpi-value" id="kKii">—</div>
+      <div class="kpi-sub" id="kKiiSub">of 35 target</div>
+      <div class="kpi-track"><div class="kpi-fill" id="kKiiBar" style="width:0"></div></div>
+    </div>
+    <div class="kpi-card green">
+      <div class="kpi-label">In-Depth Interviews</div>
+      <div class="kpi-value" id="kIdi">—</div>
+      <div class="kpi-sub" id="kIdiSub">of 60 target</div>
+      <div class="kpi-track"><div class="kpi-fill" id="kIdiBar" style="width:0"></div></div>
+    </div>
+  </div>
+
+  <div class="dash-card dash-row-1" style="margin-top:16px;">
+    <div class="dash-card-title">
+      Daily Qualitative Progress
+      <span class="dash-card-sub">KIIs &amp; IDIs by date</span>
+    </div>
+    <canvas id="qualDailyChart"></canvas>
+  </div>
+</div><!-- /qualSection -->
+
 <script>
   /* ═══════════════════════════════════════════════════
      ROLE  (set by index.html login via sessionStorage)
@@ -526,6 +566,8 @@
     const isAdmin = role === 'admin';
     document.getElementById('dailySection').style.display = isAdmin ? 'none' : '';
     document.getElementById('enumSection').style.display  = isAdmin ? 'none' : '';
+    document.getElementById('qualTabs').style.display = isAdmin ? 'flex' : 'none';
+    if (!isAdmin) switchTab('quant');
   }
 
   /* ═══════════════════════════════════════════════════
@@ -544,6 +586,12 @@
   const TARGET_VILLAGE = 4;      // respondents per village
   const TOTAL_VILLAGES = 1252;   // 313 sectors × 4 villages/sector
   const STRATA_COLORS  = ['#753918','#f7c35f','#a8632f','#dba13c'];
+
+  // Qualitative (KIIs/IDIs) — separate Google Sheet: submissiondate, idis, kiis
+  // TODO: replace with the qualitative tracker's Google Apps Script web app URL
+  const QUAL_SCRIPT_URL = 'PASTE_QUALITATIVE_APPS_SCRIPT_WEB_APP_URL_HERE';
+  const KII_TARGET = 35;
+  const IDI_TARGET = 60;
   // Display order: paired by age bracket, not grouped by sex. Falls back to
   // alphabetical for any label that doesn't match one of these exactly.
   const STRATA_ORDER = ['Men 16-30', 'Women 16-30', 'Men 31 and above', 'Women 31 and above'];
@@ -1148,6 +1196,106 @@
 
     renderEnumeratorTable();
   }
+
+  /* ═══════════════════════════════════════════════════
+     QUALITATIVE (KIIs / IDIs) — admin-only tab
+  ════════════════════════════════════════════════════ */
+  let qualLoaded = false;
+  let qualDailyChart = null;
+
+  function switchTab(tab) {
+    document.getElementById('tabQuantBtn').classList.toggle('active', tab === 'quant');
+    document.getElementById('tabQualBtn').classList.toggle('active', tab === 'qual');
+    document.getElementById('dataSection').classList.toggle('show', tab === 'quant');
+    document.getElementById('qualSection').classList.toggle('show', tab === 'qual');
+    if (tab === 'qual' && !qualLoaded) loadQualData();
+  }
+
+  async function loadQualData() {
+    qualLoaded = true;
+    try {
+      const res  = await fetch(`${QUAL_SCRIPT_URL}?t=${Date.now()}`);
+      const json = await res.json();
+      if (json.error) throw new Error(json.error);
+
+      const rows = json.rows || [];
+      if (!rows.length) return;
+
+      const keys    = Object.keys(rows[0]);
+      const dateKey = findCol(keys, 'submissiondate');
+      const idiKey  = findCol(keys, 'idis');
+      const kiiKey  = findCol(keys, 'kiis');
+
+      let totalIdi = 0, totalKii = 0;
+      const byDate = {};
+      for (const r of rows) {
+        const idi = parseFloat(r[idiKey]) || 0;
+        const kii = parseFloat(r[kiiKey]) || 0;
+        totalIdi += idi;
+        totalKii += kii;
+        const d = dateKey ? toLocalDateStr(r[dateKey]) : '';
+        if (d) {
+          if (!byDate[d]) byDate[d] = { idi: 0, kii: 0 };
+          byDate[d].idi += idi;
+          byDate[d].kii += kii;
+        }
+      }
+
+      setText('kKii', totalKii.toLocaleString());
+      setText('kKiiSub', `of ${KII_TARGET.toLocaleString()} target — ${pct(totalKii, KII_TARGET)}%`);
+      setWidth('kKiiBar', totalKii, KII_TARGET);
+      setText('kIdi', totalIdi.toLocaleString());
+      setText('kIdiSub', `of ${IDI_TARGET.toLocaleString()} target — ${pct(totalIdi, IDI_TARGET)}%`);
+      setWidth('kIdiBar', totalIdi, IDI_TARGET);
+
+      const dates  = Object.keys(byDate).sort();
+      const labels = dates.map(d => {
+        const dt = new Date(d + 'T00:00:00');
+        return isNaN(dt) ? d : dt.toLocaleDateString('en-GB', { day: '2-digit', month: 'short' });
+      });
+      const kiiData = dates.map(d => byDate[d].kii);
+      const idiData = dates.map(d => byDate[d].idi);
+
+      const canvas = document.getElementById('qualDailyChart');
+      if (qualDailyChart) {
+        qualDailyChart.data.labels = labels;
+        qualDailyChart.data.datasets[0].data = kiiData;
+        qualDailyChart.data.datasets[1].data = idiData;
+        qualDailyChart.update();
+      } else {
+        qualDailyChart = new Chart(canvas, {
+          type: 'bar',
+          data: {
+            labels,
+            datasets: [
+              { label: 'KIIs', data: kiiData, backgroundColor: 'rgba(117,57,24,0.85)', borderRadius: 5, borderSkipped: false },
+              { label: 'IDIs', data: idiData, backgroundColor: 'rgba(72,187,120,0.85)', borderRadius: 5, borderSkipped: false }
+            ]
+          },
+          options: {
+            responsive: true,
+            plugins: {
+              datalabels: { display: false },
+              legend: {
+                position: 'bottom',
+                labels: { font: { size: 11 }, padding: 8, usePointStyle: true, pointStyleWidth: 8 }
+              }
+            },
+            scales: {
+              x: { grid: { display: false }, ticks: { font: { size: 11 } } },
+              y: { beginAtZero: true, grid: { color: '#f0f4f8' }, ticks: { font: { size: 11 } } }
+            }
+          }
+        });
+      }
+    } catch (err) {
+      console.error('Qualitative data error:', err);
+      qualLoaded = false;
+    }
+  }
+
+  document.getElementById('tabQuantBtn').addEventListener('click', () => switchTab('quant'));
+  document.getElementById('tabQualBtn').addEventListener('click',  () => switchTab('qual'));
 
   /* ═══════════════════════════════════════════════════
      EVENT LISTENERS
