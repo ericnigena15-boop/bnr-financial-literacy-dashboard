@@ -1352,7 +1352,7 @@
     btnRefresh.disabled = true;
     dataSection.classList.remove('show');
     allRows = []; villageData = []; strataList = []; enumData = []; overallRow = null;
-    setStatus('Loading survey data from Google Sheets…', 'loading');
+    setStatus('Loading survey data from VANGUARD Database…', 'loading');
 
     try {
       const res  = await fetch(`${SCRIPT_URL}?t=${Date.now()}`);
@@ -1360,7 +1360,7 @@
       if (json.error) throw new Error(json.error);
 
       const rows = json.rows || [];
-      if (!rows.length) throw new Error('No rows returned — is the SurveyData sheet populated?');
+      if (!rows.length) throw new Error('No rows returned — has data collection started yet?');
 
       const keys = Object.keys(rows[0]);
 
