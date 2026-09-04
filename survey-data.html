@@ -280,7 +280,7 @@
   <span id="bannerText">Loading survey data…</span>
 </div>
 
-<div class="qual-tabs" id="qualTabs" style="display:none;">
+<div class="qual-tabs" id="qualTabs">
   <button class="qtab-btn active" id="tabQuantBtn">Quantitative</button>
   <button class="qtab-btn" id="tabQualBtn">Qualitative</button>
 </div>
@@ -533,13 +533,19 @@
 <div id="qualSection" class="data-section">
   <div class="kpi-grid" style="grid-template-columns:repeat(2,1fr);max-width:560px;">
     <div class="kpi-card">
-      <div class="kpi-label">Key Informant Interviews</div>
+      <div style="display:flex;align-items:center;gap:8px;margin-bottom:5px;">
+        <img src="KIIs.jpg" alt="" style="width:30px;height:30px;object-fit:contain;border-radius:6px;" />
+        <div class="kpi-label" style="margin-bottom:0;">Key Informant Interviews</div>
+      </div>
       <div class="kpi-value" id="kKii">—</div>
       <div class="kpi-sub" id="kKiiSub">of 35 target</div>
       <div class="kpi-track"><div class="kpi-fill" id="kKiiBar" style="width:0"></div></div>
     </div>
     <div class="kpi-card green">
-      <div class="kpi-label">In-Depth Interviews</div>
+      <div style="display:flex;align-items:center;gap:8px;margin-bottom:5px;">
+        <img src="IDIs.jpg" alt="" style="width:30px;height:30px;object-fit:contain;border-radius:6px;" />
+        <div class="kpi-label" style="margin-bottom:0;">In-Depth Interviews</div>
+      </div>
       <div class="kpi-value" id="kIdi">—</div>
       <div class="kpi-sub" id="kIdiSub">of 60 target</div>
       <div class="kpi-track"><div class="kpi-fill" id="kIdiBar" style="width:0"></div></div>
@@ -564,10 +570,7 @@
   function applyRole(role) {
     currentRole = role;
     const isAdmin = role === 'admin';
-    document.getElementById('dailySection').style.display = isAdmin ? 'none' : '';
     document.getElementById('enumSection').style.display  = isAdmin ? 'none' : '';
-    document.getElementById('qualTabs').style.display = isAdmin ? 'flex' : 'none';
-    if (!isAdmin) switchTab('quant');
   }
 
   /* ═══════════════════════════════════════════════════
