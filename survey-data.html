@@ -12,9 +12,9 @@
   <link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:opsz,wght,FILL,GRAD@24,400,0,0" rel="stylesheet">
   <style>
     :root {
-      --blue:       #6B3A24;
-      --blue-dark:  #4A2414;
-      --blue-light: #F3E4D0;
+      --blue:       #753918;
+      --blue-dark:  #582B12;
+      --blue-light: #fcf7ea;
       --green:      #48bb78;
       --red:        #fc8181;
       --yellow:     #f6ad55;
@@ -112,6 +112,7 @@
       background: var(--white); border-radius: 10px;
       padding: 20px 22px; box-shadow: 0 1px 5px rgba(0,0,0,0.07);
     }
+    .dash-card-yn { padding-top: 14px; padding-bottom: 16px; }
     .dash-card-title {
       font-family: 'Raleway', sans-serif;
       font-size: 0.87rem; font-weight: 700; color: #1a202c;
@@ -125,9 +126,9 @@
       display: inline-block; white-space: nowrap; word-wrap: normal; direction: ltr;
       vertical-align: middle;
     }
-    .dash-card-hero { text-align: center; margin-bottom: 14px; }
-    .dash-card-hero img { width: 100px; height: 100px; object-fit: contain; border-radius: 16px; }
-    .dash-card-hero .material-symbols-outlined { font-size: 90px; color: var(--blue); }
+    .dash-card-hero { text-align: center; margin-bottom: 8px; }
+    .dash-card-hero img { width: 78px; height: 78px; object-fit: contain; border-radius: 16px; }
+    .dash-card-hero .material-symbols-outlined { font-size: 70px; color: var(--blue); }
     .filter-icon { font-size: 20px; margin-right: 3px; color: var(--blue); }
 
     /* ── Strata bars ── */
@@ -334,6 +335,12 @@
     </div>
   </div>
 
+  <!-- Shared key for all Yes/No cards below -->
+  <div style="text-align:center;font-size:0.8rem;color:var(--gray);margin-bottom:10px;">
+    <span style="display:inline-block;width:10px;height:10px;border-radius:50%;background:#48bb78;margin-right:5px;"></span>Yes
+    <span style="display:inline-block;width:10px;height:10px;border-radius:50%;background:#a0aec0;margin:0 5px 0 16px;"></span>No
+  </div>
+
   <!-- Strata + Phone ownership — 3-column row -->
   <div class="dash-row-3">
     <div class="dash-card">
@@ -346,42 +353,38 @@
       </div>
     </div>
 
-    <div class="dash-card">
+    <div class="dash-card dash-card-yn">
       <div class="dash-card-title">Mobile Money Ownership</div>
-      <div style="display:flex;justify-content:space-between;align-items:flex-start;margin-bottom:14px;">
+      <div style="display:flex;justify-content:space-between;align-items:center;margin:14px 0 10px;">
         <div>
-          <div class="yn-label yes">Yes</div>
-          <div style="font-size:1.5rem;font-weight:800;color:#276749;line-height:1.2" id="mob-yes-count">—</div>
+          <div style="font-size:2.6rem;font-weight:800;color:#276749;line-height:1.2" id="mob-yes-count">—</div>
           <div class="yn-pct" id="mob-yes-pct"></div>
         </div>
         <div style="text-align:right">
-          <div class="yn-label no">No</div>
-          <div style="font-size:1.5rem;font-weight:800;color:#4a5568;line-height:1.2" id="mob-no-count">—</div>
+          <div style="font-size:2.6rem;font-weight:800;color:#4a5568;line-height:1.2" id="mob-no-count">—</div>
           <div class="yn-pct" id="mob-no-pct"></div>
         </div>
       </div>
       <div class="dash-card-hero"><img src="Momo.png" alt="" /></div>
-      <div style="height:55px;position:relative;">
+      <div style="height:42px;position:relative;">
         <canvas id="mobChart"></canvas>
       </div>
     </div>
 
-    <div class="dash-card">
+    <div class="dash-card dash-card-yn">
       <div class="dash-card-title">Smartphone Access</div>
-      <div style="display:flex;justify-content:space-between;align-items:flex-start;margin-bottom:14px;">
+      <div style="display:flex;justify-content:space-between;align-items:center;margin:14px 0 10px;">
         <div>
-          <div class="yn-label yes">Yes</div>
-          <div style="font-size:1.5rem;font-weight:800;color:#276749;line-height:1.2" id="smart-yes-count">—</div>
+          <div style="font-size:2.6rem;font-weight:800;color:#276749;line-height:1.2" id="smart-yes-count">—</div>
           <div class="yn-pct" id="smart-yes-pct"></div>
         </div>
         <div style="text-align:right">
-          <div class="yn-label no">No</div>
-          <div style="font-size:1.5rem;font-weight:800;color:#4a5568;line-height:1.2" id="smart-no-count">—</div>
+          <div style="font-size:2.6rem;font-weight:800;color:#4a5568;line-height:1.2" id="smart-no-count">—</div>
           <div class="yn-pct" id="smart-no-pct"></div>
         </div>
       </div>
       <div class="dash-card-hero"><img src="black-white-image-person-holding-phone.avif" alt="" /></div>
-      <div style="height:55px;position:relative;">
+      <div style="height:42px;position:relative;">
         <canvas id="smartChart"></canvas>
       </div>
     </div>
@@ -389,62 +392,56 @@
 
   <!-- Financial literacy indicators — 3-column row -->
   <div class="dash-row-3">
-    <div class="dash-card">
+    <div class="dash-card dash-card-yn">
       <div class="dash-card-title">Insurance Coverage</div>
-      <div style="display:flex;justify-content:space-between;align-items:flex-start;margin-bottom:14px;">
+      <div style="display:flex;justify-content:space-between;align-items:center;margin:14px 0 10px;">
         <div>
-          <div class="yn-label yes">Yes</div>
-          <div style="font-size:1.5rem;font-weight:800;color:#276749;line-height:1.2" id="ins-yes-count">—</div>
+          <div style="font-size:2.6rem;font-weight:800;color:#276749;line-height:1.2" id="ins-yes-count">—</div>
           <div class="yn-pct" id="ins-yes-pct"></div>
         </div>
         <div style="text-align:right">
-          <div class="yn-label no">No</div>
-          <div style="font-size:1.5rem;font-weight:800;color:#4a5568;line-height:1.2" id="ins-no-count">—</div>
+          <div style="font-size:2.6rem;font-weight:800;color:#4a5568;line-height:1.2" id="ins-no-count">—</div>
           <div class="yn-pct" id="ins-no-pct"></div>
         </div>
       </div>
       <div class="dash-card-hero"><img src="insurance-icon-10.png" alt="" /></div>
-      <div style="height:55px;position:relative;">
+      <div style="height:42px;position:relative;">
         <canvas id="insChart"></canvas>
       </div>
     </div>
 
-    <div class="dash-card">
+    <div class="dash-card dash-card-yn">
       <div class="dash-card-title">Pension Coverage</div>
-      <div style="display:flex;justify-content:space-between;align-items:flex-start;margin-bottom:14px;">
+      <div style="display:flex;justify-content:space-between;align-items:center;margin:14px 0 10px;">
         <div>
-          <div class="yn-label yes">Yes</div>
-          <div style="font-size:1.5rem;font-weight:800;color:#276749;line-height:1.2" id="pen-yes-count">—</div>
+          <div style="font-size:2.6rem;font-weight:800;color:#276749;line-height:1.2" id="pen-yes-count">—</div>
           <div class="yn-pct" id="pen-yes-pct"></div>
         </div>
         <div style="text-align:right">
-          <div class="yn-label no">No</div>
-          <div style="font-size:1.5rem;font-weight:800;color:#4a5568;line-height:1.2" id="pen-no-count">—</div>
+          <div style="font-size:2.6rem;font-weight:800;color:#4a5568;line-height:1.2" id="pen-no-count">—</div>
           <div class="yn-pct" id="pen-no-pct"></div>
         </div>
       </div>
-      <div class="dash-card-hero"><span class="material-symbols-outlined">elderly</span></div>
-      <div style="height:55px;position:relative;">
-        <canvas id="penChart"></canvas>
+      <div style="height:180px;position:relative;">
+        <img src="retirement.jpg" alt="" style="position:absolute;top:42%;left:50%;transform:translate(-50%,-50%);width:82px;height:82px;object-fit:contain;pointer-events:none;z-index:1;" />
+        <canvas id="penChart" style="position:relative;z-index:2;"></canvas>
       </div>
     </div>
 
-    <div class="dash-card">
+    <div class="dash-card dash-card-yn">
       <div class="dash-card-title">Financial Training</div>
-      <div style="display:flex;justify-content:space-between;align-items:flex-start;margin-bottom:14px;">
+      <div style="display:flex;justify-content:space-between;align-items:center;margin:14px 0 10px;">
         <div>
-          <div class="yn-label yes">Yes</div>
-          <div style="font-size:1.5rem;font-weight:800;color:#276749;line-height:1.2" id="fin-yes-count">—</div>
+          <div style="font-size:2.6rem;font-weight:800;color:#276749;line-height:1.2" id="fin-yes-count">—</div>
           <div class="yn-pct" id="fin-yes-pct"></div>
         </div>
         <div style="text-align:right">
-          <div class="yn-label no">No</div>
-          <div style="font-size:1.5rem;font-weight:800;color:#4a5568;line-height:1.2" id="fin-no-count">—</div>
+          <div style="font-size:2.6rem;font-weight:800;color:#4a5568;line-height:1.2" id="fin-no-count">—</div>
           <div class="yn-pct" id="fin-no-pct"></div>
         </div>
       </div>
-      <div class="dash-card-hero"><img src="ChatGPT%20Image%20Sep%204%2C%202026%2C%2001_25_15%20AM.png" alt="" /></div>
-      <div style="height:55px;position:relative;">
+      <div class="dash-card-hero"><img src="financial-training-icon.avif" alt="" /></div>
+      <div style="height:42px;position:relative;">
         <canvas id="finChart"></canvas>
       </div>
     </div>
@@ -546,7 +543,7 @@
   const TARGET_STRATA  = 1252;   // per stratum: Men 16-30 / Men 31+ / Women 16-30 / Women 31+
   const TARGET_VILLAGE = 4;      // respondents per village
   const TOTAL_VILLAGES = 1252;   // 313 sectors × 4 villages/sector
-  const STRATA_COLORS  = ['#6B3A24','#E8A33D','#B5651D','#8C6239'];
+  const STRATA_COLORS  = ['#753918','#f7c35f','#a8632f','#dba13c'];
   // Display order: paired by age bracket, not grouped by sex. Falls back to
   // alphabetical for any label that doesn't match one of these exactly.
   const STRATA_ORDER = ['Men 16-30', 'Women 16-30', 'Men 31 and above', 'Women 31 and above'];
@@ -696,6 +693,13 @@
   /* ═══════════════════════════════════════════════════
      STRATA
   ════════════════════════════════════════════════════ */
+  const STRATA_ICONS = {
+    'Men 16-30': 'Under%2030%20male.jpg',
+    'Women 16-30': 'under%2030%20female.jpg',
+    'Men 31 and above': 'Beyond%2030%20male.jpg',
+    'Women 31 and above': 'Beyond%2030%20female.jpg',
+  };
+
   function renderStrata(rows, strataKey) {
     const container = document.getElementById('strataList');
     if (!strataKey) {
@@ -712,13 +716,20 @@
       ? entries.map(([label, count], i) => {
           const p = Math.min(100, Math.round(count / TARGET_STRATA * 100));
           const color = STRATA_COLORS[i % STRATA_COLORS.length];
-          return `<div>
-            <div class="strata-row-hdr">
-              <span class="strata-name-lbl" style="color:${color}">${label}</span>
-              <span class="strata-cnt">${count.toLocaleString()} / ${TARGET_STRATA.toLocaleString()}</span>
-            </div>
-            <div class="bar-track">
-              <div class="bar-fill" style="width:${p}%;background:${color}"></div>
+          const icon  = STRATA_ICONS[label];
+          const iconHtml = icon
+            ? `<img src="${icon}" alt="" style="width:34px;height:46px;object-fit:contain;flex-shrink:0;" />`
+            : '';
+          return `<div style="display:flex;align-items:center;gap:12px;">
+            ${iconHtml}
+            <div style="flex:1;min-width:0;">
+              <div class="strata-row-hdr">
+                <span class="strata-name-lbl" style="color:${color}">${label}</span>
+                <span class="strata-cnt">${count.toLocaleString()} / ${TARGET_STRATA.toLocaleString()}</span>
+              </div>
+              <div class="bar-track">
+                <div class="bar-fill" style="width:${p}%;background:${color}"></div>
+              </div>
             </div>
           </div>`;
         }).join('')
@@ -728,7 +739,7 @@
   /* ═══════════════════════════════════════════════════
      PHONE OWNERSHIP
   ════════════════════════════════════════════════════ */
-  function renderPhone(prefix, rows, colKey) {
+  function renderPhone(prefix, rows, colKey, chartType = 'bar') {
     let yes = 0, no = 0;
     if (colKey) {
       for (const r of rows) {
@@ -738,14 +749,49 @@
       }
     }
     const total = yes + no;
-    setText(`${prefix}-yes-count`, yes.toLocaleString());
-    setText(`${prefix}-no-count`,  no.toLocaleString());
-    setText(`${prefix}-yes-pct`, total ? `${pct(yes, total)}% of respondents` : '');
-    setText(`${prefix}-no-pct`,  total ? `${pct(no,  total)}% of respondents` : '');
+    setText(`${prefix}-yes-count`, total ? `${pct(yes, total)}%` : '—');
+    setText(`${prefix}-no-count`,  total ? `${pct(no,  total)}%` : '—');
+    setText(`${prefix}-yes-pct`, `${yes.toLocaleString()} respondent${yes !== 1 ? 's' : ''}`);
+    setText(`${prefix}-no-pct`,  `${no.toLocaleString()} respondent${no !== 1 ? 's' : ''}`);
 
-    // Stacked horizontal bar chart
     const canvas = document.getElementById(`${prefix}Chart`);
     if (!canvas) return;
+
+    if (chartType === 'doughnut') {
+      if (phoneCharts[prefix]) {
+        phoneCharts[prefix].data.datasets[0].data = [yes, no];
+        phoneCharts[prefix].update();
+      } else {
+        phoneCharts[prefix] = new Chart(canvas, {
+          type: 'doughnut',
+          data: {
+            labels: ['Yes', 'No'],
+            datasets: [{ data: [yes, no], backgroundColor: ['#48bb78', '#a0aec0'], borderWidth: 0 }]
+          },
+          options: {
+            responsive: true,
+            maintainAspectRatio: false,
+            cutout: '65%',
+            plugins: {
+              datalabels: { display: false },
+              legend: { display: false },
+              tooltip: {
+                callbacks: {
+                  label: ctx => {
+                    const ds = phoneCharts[prefix].data.datasets[0].data;
+                    const t  = (ds[0] || 0) + (ds[1] || 0);
+                    return ` ${ctx.label}: ${ctx.parsed.toLocaleString()} (${pct(ctx.parsed, t)}%)`;
+                  }
+                }
+              }
+            }
+          }
+        });
+      }
+      return;
+    }
+
+    // Stacked horizontal bar chart
     if (phoneCharts[prefix]) {
       phoneCharts[prefix].data.datasets[0].data = [yes];
       phoneCharts[prefix].data.datasets[1].data = [no];
@@ -767,10 +813,7 @@
           maintainAspectRatio: false,
           plugins: {
             datalabels: { display: false },
-            legend: {
-              position: 'bottom',
-              labels: { font: { size: 11 }, padding: 8, usePointStyle: true, pointStyleWidth: 8 }
-            },
+            legend: { display: false },
             tooltip: {
               callbacks: {
                 label: ctx => {
@@ -820,7 +863,7 @@
           datasets: [
             { label: 'Daily Submissions', data: daily,
               backgroundColor: 'rgba(107,58,36,0.75)',
-              hoverBackgroundColor: '#4A2414',
+              hoverBackgroundColor: '#582B12',
               borderRadius: 5, borderSkipped: false }
           ]
         },
@@ -836,7 +879,7 @@
               offset: 0,
               formatter: v => v,
               font: { size: 11, weight: '700' },
-              color: '#4A2414'
+              color: '#582B12'
             }
           },
           scales: {
@@ -1030,7 +1073,7 @@
     renderPhone('mob',   rows, ck.mob);
     renderPhone('smart', rows, ck.smart);
     renderPhone('ins',   rows, ck.insurance);
-    renderPhone('pen',   rows, ck.pension);
+    renderPhone('pen',   rows, ck.pension, 'doughnut');
     renderPhone('fin',   rows, ck.training);
     renderDaily(rows, ck.date);
     renderVillageTable();
