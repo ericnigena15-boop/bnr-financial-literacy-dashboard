@@ -145,7 +145,7 @@
     modal.classList.add('hidden');
     frame.style.display = 'block';
     if (!frame.src || frame.src === window.location.href) frame.src = frame.dataset.src;
-    const labels = { client: 'Client', admin: 'Admin' };
+    const labels = { client: 'BNR Staff', admin: 'Admin' };
     roleTag.textContent = labels[role] || role;
     roleTag.className   = `role-${role}`;
     hdrAuth.style.display = 'flex';
