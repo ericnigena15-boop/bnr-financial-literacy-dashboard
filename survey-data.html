@@ -469,6 +469,22 @@
     </div>
   </div>
 
+  <!-- Floating summary bar: financial knowledge / emergency expense capacity / consumer rights awareness -->
+  <div class="dash-card dash-row-1" id="extraStatsBar" style="display:flex;justify-content:space-around;align-items:center;flex-wrap:wrap;gap:16px;box-shadow:0 4px 16px rgba(0,0,0,0.12);">
+    <div style="text-align:center;">
+      <div class="kpi-label">Financial Knowledge</div>
+      <div class="kpi-value" id="kFinKnow" style="font-size:1.6rem;color:var(--blue);">—</div>
+    </div>
+    <div style="text-align:center;">
+      <div class="kpi-label">Emergency Expense Capacity</div>
+      <div class="kpi-value" id="kEmerg" style="font-size:1.6rem;color:var(--blue);">—</div>
+    </div>
+    <div style="text-align:center;">
+      <div class="kpi-label">Consumer Rights Awareness</div>
+      <div class="kpi-value" id="kConsumer" style="font-size:1.6rem;color:var(--blue);">—</div>
+    </div>
+  </div>
+
   <!-- Daily submissions chart — hidden for admin/supervisor role -->
   <div class="dash-card dash-row-1" id="dailySection">
     <div class="dash-card-title">
@@ -1075,6 +1091,13 @@
     setText('kMsme', ck.msme ? msmeCount.toLocaleString() : '—');
     setText('kMsmeSub', ck.msme ? `${pct(msmeCount, total)}% of respondents` : 'business_owner column not found');
 
+    const finKnowCount  = ck.finKnow  ? rows.filter(r => isYes(r[ck.finKnow])).length  : 0;
+    const emergCount    = ck.emergCap ? rows.filter(r => isYes(r[ck.emergCap])).length : 0;
+    const consumerCount = ck.consumerAware ? rows.filter(r => isYes(r[ck.consumerAware])).length : 0;
+    setText('kFinKnow',  ck.finKnow       ? `${pct(finKnowCount, total)}%`  : '—');
+    setText('kEmerg',    ck.emergCap      ? `${pct(emergCount, total)}%`   : '—');
+    setText('kConsumer', ck.consumerAware ? `${pct(consumerCount, total)}%` : '—');
+
     /* — Village aggregation — */
     if (ck.village) {
       const vMap = {};
@@ -1376,6 +1399,9 @@
         dur:      findCol(keys, 'duration_minutes'),
         pwd:      findCol(keys, 'pwd_flag'),
         msme:     findCol(keys, 'business_owner'),
+        finKnow:       findCol(keys, 'financial_knowledge_score'),
+        emergCap:      findCol(keys, 'emergency_expense_capacity'),
+        consumerAware: findCol(keys, 'consumer_rights_awareness'),
       };
 
       if (!colKeys.unique) throw new Error(`"submission_id" column not found. Columns: ${keys.join(', ')}`);
