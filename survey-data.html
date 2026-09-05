@@ -97,7 +97,7 @@
     .data-section.show { display: block; }
 
     /* ── KPI grid ── */
-    .kpi-grid { display: grid; grid-template-columns: repeat(6,1fr); gap: 14px; margin-bottom: 16px; }
+    .kpi-grid { display: grid; grid-template-columns: repeat(5,1fr); gap: 14px; margin-bottom: 16px; }
     .kpi-card {
       background: var(--white); border-radius: 10px;
       padding: 16px 18px 14px; box-shadow: 0 1px 5px rgba(0,0,0,0.07);
@@ -340,7 +340,6 @@
       </div>
       <div class="kpi-value" id="kPwd">—</div>
       <div class="kpi-sub" id="kPwdSub"></div>
-      <div class="kpi-track"><div class="kpi-fill" id="kPwdBar" style="width:0"></div></div>
     </div>
     <div class="kpi-card">
       <div style="display:flex;align-items:center;gap:8px;margin-bottom:5px;">
@@ -349,12 +348,6 @@
       </div>
       <div class="kpi-value" id="kMsme">—</div>
       <div class="kpi-sub" id="kMsmeSub"></div>
-      <div class="kpi-track"><div class="kpi-fill" id="kMsmeBar" style="width:0"></div></div>
-    </div>
-    <div class="kpi-card green">
-      <div class="kpi-label">Completion Rate</div>
-      <div class="kpi-value" id="kRate">—</div>
-      <div class="kpi-track"><div class="kpi-fill" id="kRateBar" style="width:0"></div></div>
     </div>
     <div class="kpi-card yellow">
       <div class="kpi-label">Villages Completed</div>
@@ -1078,18 +1071,14 @@
     setText('kTotal', total.toLocaleString());
     setText('kTotalSub', `of ${TARGET_TOTAL.toLocaleString()} target — ${pct(total, TARGET_TOTAL)}%`);
     setWidth('kTotalBar', total, TARGET_TOTAL);
-    setText('kRate', `${pct(total, TARGET_TOTAL)}%`);
-    setWidth('kRateBar', total, TARGET_TOTAL);
 
     const isYes = v => ['yes','true','1'].includes(String(v ?? '').trim().toLowerCase());
     const pwdCount  = ck.pwd  ? rows.filter(r => isYes(r[ck.pwd])).length  : 0;
     const msmeCount = ck.msme ? rows.filter(r => isYes(r[ck.msme])).length : 0;
     setText('kPwd', ck.pwd ? pwdCount.toLocaleString() : '—');
     setText('kPwdSub', ck.pwd ? `${pct(pwdCount, total)}% of respondents` : 'pwd_flag column not found');
-    setWidth('kPwdBar', pwdCount, total || 1);
     setText('kMsme', ck.msme ? msmeCount.toLocaleString() : '—');
     setText('kMsmeSub', ck.msme ? `${pct(msmeCount, total)}% of respondents` : 'business_owner column not found');
-    setWidth('kMsmeBar', msmeCount, total || 1);
 
     /* — Village aggregation — */
     if (ck.village) {
