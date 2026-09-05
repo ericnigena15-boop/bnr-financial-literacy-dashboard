@@ -325,10 +325,23 @@
   <!-- KPI cards -->
   <div class="kpi-grid">
     <div class="kpi-card">
-      <div class="kpi-label">Surveys Completed</div>
+      <div style="display:flex;align-items:center;gap:8px;margin-bottom:5px;">
+        <img src="check-mark.jpg" alt="" style="width:22px;height:22px;object-fit:contain;" />
+        <div class="kpi-label" style="margin-bottom:0;">Surveys Completed</div>
+      </div>
       <div class="kpi-value" id="kTotal">—</div>
       <div class="kpi-sub" id="kTotalSub">of 5,008 target</div>
       <div class="kpi-track"><div class="kpi-fill" id="kTotalBar" style="width:0"></div></div>
+      <div style="display:flex;gap:16px;margin-top:9px;font-size:0.75rem;color:var(--gray);">
+        <span style="display:flex;align-items:center;gap:5px;">
+          <img src="PWDs.png" alt="" style="width:16px;height:16px;object-fit:contain;" />
+          <span id="kPwd">—</span> PWDs
+        </span>
+        <span style="display:flex;align-items:center;gap:5px;">
+          <img src="SMEs%20icon.png" alt="" style="width:16px;height:16px;object-fit:contain;" />
+          <span id="kMsme">—</span> MSMEs
+        </span>
+      </div>
     </div>
     <div class="kpi-card green">
       <div class="kpi-label">Completion Rate</div>
@@ -1060,6 +1073,10 @@
     setText('kRate', `${pct(total, TARGET_TOTAL)}%`);
     setWidth('kRateBar', total, TARGET_TOTAL);
 
+    const isYes = v => ['yes','true','1'].includes(String(v ?? '').trim().toLowerCase());
+    setText('kPwd',  ck.pwd  ? rows.filter(r => isYes(r[ck.pwd])).length.toLocaleString()  : '—');
+    setText('kMsme', ck.msme ? rows.filter(r => isYes(r[ck.msme])).length.toLocaleString() : '—');
+
     /* — Village aggregation — */
     if (ck.village) {
       const vMap = {};
@@ -1359,6 +1376,8 @@
         strata:   findCol(keys, 'strata'),
         enum:     findCol(keys, 'enumerator_name'),
         dur:      findCol(keys, 'duration_minutes'),
+        pwd:      findCol(keys, 'pwd_flag'),
+        msme:     findCol(keys, 'business_owner'),
       };
 
       if (!colKeys.unique) throw new Error(`"submission_id" column not found. Columns: ${keys.join(', ')}`);
