@@ -152,7 +152,7 @@
     .strata-list { display: flex; flex-direction: column; gap: 14px; }
     .strata-row-hdr { display: flex; justify-content: space-between; margin-bottom: 4px; align-items: baseline; }
     .strata-name-lbl { font-size: 0.82rem; font-weight: 700; }
-    .strata-cnt { font-size: 0.79rem; color: var(--gray); }
+    .strata-cnt { font-family: 'Arial Narrow', Arial, sans-serif; font-size: 1.6rem; font-weight: 700; color: var(--gray); }
     .bar-track { height: 4px; background: #e2e8f0; border-radius: 2px; overflow: hidden; }
     .bar-fill  { height: 100%; border-radius: 2px; transition: width 0.7s ease; }
 
@@ -368,7 +368,7 @@
   <div class="dash-row-3">
     <div class="dash-card">
       <div class="dash-card-title">
-        Progress by Strata (Age &amp; Sex)
+        Progress by Strata
       </div>
       <div class="strata-list" id="strataList">
         <div style="color:var(--gray);font-size:0.85rem">Loading…</div>
@@ -779,7 +779,7 @@
             <div style="flex:1;min-width:0;">
               <div class="strata-row-hdr">
                 <span class="strata-name-lbl" style="color:${color}">${label}</span>
-                <span class="strata-cnt">${count.toLocaleString()} / ${TARGET_STRATA.toLocaleString()}</span>
+                <span class="strata-cnt">${count.toLocaleString()}</span>
               </div>
               <div class="bar-track">
                 <div class="bar-fill" style="width:${p}%;background:${color}"></div>
