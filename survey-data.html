@@ -1064,7 +1064,7 @@
     }
     const total = uniqueIds.size;
     setText('kTotal', total.toLocaleString());
-    setText('kTotalSub', `of ${TARGET_TOTAL.toLocaleString()} target — ${pct(total, TARGET_TOTAL)}%`);
+    document.getElementById('kTotalSub').innerHTML = `of ${TARGET_TOTAL.toLocaleString()} target (<strong>${pct(total, TARGET_TOTAL)}%</strong>)`;
     setWidth('kTotalBar', total, TARGET_TOTAL);
 
     const isYes = v => ['yes','true','1'].includes(String(v ?? '').trim().toLowerCase());
