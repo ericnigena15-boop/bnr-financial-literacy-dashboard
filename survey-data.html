@@ -324,29 +324,23 @@
 
   <!-- KPI cards -->
   <div class="kpi-grid">
-    <div class="kpi-card" style="text-align:center;display:flex;flex-direction:column;min-height:180px;">
+    <div class="kpi-card" style="text-align:center;display:flex;flex-direction:column;min-height:180px;position:relative;">
       <div class="kpi-label">Surveys Completed</div>
-      <div style="display:flex;align-items:center;justify-content:center;gap:40px;flex:1;">
-        <div class="kpi-value" id="kTotal" style="color:var(--blue);">—</div>
-        <img src="check-mark.jpg" alt="" style="width:64px;height:64px;object-fit:contain;" />
-      </div>
+      <div class="kpi-value" id="kTotal" style="color:var(--blue);flex:1;display:flex;align-items:center;justify-content:center;">—</div>
+      <img src="check-mark.jpg" alt="" style="position:absolute;left:16px;top:50%;transform:translateY(-50%);width:56px;height:56px;object-fit:contain;" />
       <div class="kpi-sub" id="kTotalSub">of 5,008 target</div>
       <div class="kpi-track"><div class="kpi-fill" id="kTotalBar" style="width:0"></div></div>
     </div>
-    <div class="kpi-card" style="text-align:center;display:flex;flex-direction:column;min-height:180px;">
+    <div class="kpi-card" style="text-align:center;display:flex;flex-direction:column;min-height:180px;position:relative;">
       <div class="kpi-label">Persons with Disabilities</div>
-      <div style="display:flex;align-items:center;justify-content:center;gap:40px;flex:1;">
-        <div class="kpi-value" id="kPwd" style="color:var(--blue);">—</div>
-        <img src="PWDs.png" alt="" style="width:40px;height:40px;object-fit:contain;" />
-      </div>
+      <div class="kpi-value" id="kPwd" style="color:var(--blue);flex:1;display:flex;align-items:center;justify-content:center;">—</div>
+      <img src="PWDs.png" alt="" style="position:absolute;left:16px;top:50%;transform:translateY(-50%);width:40px;height:40px;object-fit:contain;" />
       <div class="kpi-sub" id="kPwdSub"></div>
     </div>
-    <div class="kpi-card" style="text-align:center;display:flex;flex-direction:column;min-height:180px;">
+    <div class="kpi-card" style="text-align:center;display:flex;flex-direction:column;min-height:180px;position:relative;">
       <div class="kpi-label">MSMEs</div>
-      <div style="display:flex;align-items:center;justify-content:center;gap:40px;flex:1;">
-        <div class="kpi-value" id="kMsme" style="color:var(--blue);">—</div>
-        <img src="SMEs%20icon.png" alt="" style="width:40px;height:40px;object-fit:contain;" />
-      </div>
+      <div class="kpi-value" id="kMsme" style="color:var(--blue);flex:1;display:flex;align-items:center;justify-content:center;">—</div>
+      <img src="SMEs%20icon.png" alt="" style="position:absolute;left:16px;top:50%;transform:translateY(-50%);width:40px;height:40px;object-fit:contain;" />
       <div class="kpi-sub" id="kMsmeSub"></div>
     </div>
     <div class="kpi-card yellow" style="text-align:center;display:flex;flex-direction:column;min-height:180px;">
