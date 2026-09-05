@@ -98,6 +98,7 @@
 
     /* ── KPI grid ── */
     .kpi-grid { display: grid; grid-template-columns: repeat(5,1fr); gap: 14px; margin-bottom: 16px; }
+    .qual-kpi-grid { grid-template-columns: repeat(2,1fr); }
     .kpi-card {
       background: var(--white); border-radius: 10px;
       padding: 16px 18px 14px; box-shadow: 0 1px 5px rgba(0,0,0,0.07);
@@ -558,7 +559,7 @@
 </div><!-- /dataSection -->
 
 <div id="qualSection" class="data-section">
-  <div class="kpi-grid" style="grid-template-columns:repeat(2,1fr);">
+  <div class="kpi-grid qual-kpi-grid">
     <div class="kpi-card" style="display:flex;align-items:center;gap:18px;">
       <img src="KIIs.jpg" alt="" style="width:72px;height:72px;object-fit:contain;border-radius:10px;flex-shrink:0;" />
       <div style="flex:1;min-width:0;">
