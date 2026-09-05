@@ -188,8 +188,8 @@
     }
     .tbl-search:focus { border-color: var(--blue); }
     .tbl-info { font-size: 0.78rem; color: var(--gray); }
-    .tbl-scroll { max-height: 420px; overflow-y: auto; border-radius: 8px; border: 1px solid var(--border); }
-    .tbl-scroll table { width: 100%; border-collapse: collapse; font-size: 0.81rem; }
+    .tbl-scroll { max-height: 420px; overflow-y: auto; overflow-x: auto; border-radius: 8px; border: 1px solid var(--border); }
+    .tbl-scroll table { min-width: max-content; width: 100%; border-collapse: collapse; font-size: 0.81rem; }
     .tbl-scroll thead th {
       position: sticky; top: 0; z-index: 2;
       background: #f7fafc; padding: 9px 12px;
@@ -273,7 +273,12 @@
       .dash-row-3 { grid-template-columns: 1fr; }
     }
     @media (max-width: 520px) {
-      .kpi-grid { grid-template-columns: 1fr 1fr; }
+      .kpi-grid { grid-template-columns: 1fr; }
+      .kpi-card { min-height: auto !important; }
+      .kpi-value { font-size: 1.8rem; }
+      .qual-tabs { flex-wrap: wrap; }
+      .filter-select { min-width: 120px; }
+      #extraStatsBar { justify-content: center; }
     }
 
   </style>
