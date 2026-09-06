@@ -605,7 +605,7 @@
   /* ═══════════════════════════════════════════════════
      CONFIG
   ════════════════════════════════════════════════════ */
-  const SCRIPT_URL     = 'https://script.google.com/macros/s/AKfycbwqk8mE_wwf3ew0IaOz5HVmqh5xAtwEshUYz0M_I065SMExqu46boThj3ltpwAc-jdF/exec';
+  const CSV_URL     = 'https://docs.google.com/spreadsheets/d/e/2PACX-1vRmXHAoHJFVgj_RjH4xZLr5UQjLl9Lc92M-p1H2ZvCt5CX6SW0w5ipxsImSChjD5RGyw1tHqS-C2h99/pub?gid=0&single=true&output=csv';
   const TARGET_TOTAL   = 5008;   // 1,252 villages × 4 strata (one respondent per stratum per village)
   const TARGET_STRATA  = 1252;   // per stratum: Men 16-30 / Men 31+ / Women 16-30 / Women 31+
   const TARGET_VILLAGE = 4;      // respondents per village
@@ -613,7 +613,7 @@
   const STRATA_COLORS  = ['#753918','#f7c35f','#a8632f','#dba13c'];
 
   // Qualitative (KIIs/IDIs) — separate Google Sheet: submissiondate, idis, kiis
-  const QUAL_SCRIPT_URL = 'https://script.google.com/macros/s/AKfycbyFSAGIm-JrS2WgXNkJIv9kgJSmA_oTvF6Pqqf13u2BatXk-q5icK8bMF0OgLZlMlr-ZQ/exec';
+  const QUAL_CSV_URL = 'https://docs.google.com/spreadsheets/d/e/2PACX-1vRmXHAoHJFVgj_RjH4xZLr5UQjLl9Lc92M-p1H2ZvCt5CX6SW0w5ipxsImSChjD5RGyw1tHqS-C2h99/pub?gid=1731230853&single=true&output=csv';
   const KII_TARGET = 35;
   const IDI_TARGET = 60;
   // Display order: paired by age bracket, not grouped by sex. Falls back to
@@ -658,6 +658,45 @@
   function fmt(v, dp = 1) { return v != null && isFinite(v) ? v.toFixed(dp) : '—'; }
   function findCol(keys, name) {
     return keys.find(k => k.trim().toLowerCase() === name.toLowerCase()) || null;
+  }
+
+  // Parses a CSV string (RFC4180-ish: quoted fields, embedded commas/newlines, "" escapes)
+  // into an array of row objects keyed by the header row — same shape the rest of the
+  // code expects from the old {rows:[...]} JSON API.
+  function parseCSV(text) {
+    const table = [];
+    let row = [], field = '', inQuotes = false;
+    for (let i = 0; i < text.length; i++) {
+      const c = text[i];
+      if (inQuotes) {
+        if (c === '"') {
+          if (text[i + 1] === '"') { field += '"'; i++; }
+          else { inQuotes = false; }
+        } else {
+          field += c;
+        }
+      } else if (c === '"') {
+        inQuotes = true;
+      } else if (c === ',') {
+        row.push(field); field = '';
+      } else if (c === '\n' || c === '\r') {
+        if (c === '\r' && text[i + 1] === '\n') i++;
+        row.push(field); field = '';
+        table.push(row); row = [];
+      } else {
+        field += c;
+      }
+    }
+    if (field.length > 0 || row.length > 0) { row.push(field); table.push(row); }
+    while (table.length && table[table.length - 1].every(f => f === '')) table.pop();
+
+    if (!table.length) return [];
+    const headers = table[0];
+    return table.slice(1).map(r => {
+      const obj = {};
+      headers.forEach((h, idx) => { obj[h] = r[idx] ?? ''; });
+      return obj;
+    });
   }
 
   /* ═══════════════════════════════════════════════════
@@ -1238,11 +1277,10 @@
   async function loadQualData() {
     qualLoaded = true;
     try {
-      const res  = await fetch(`${QUAL_SCRIPT_URL}?t=${Date.now()}`);
-      const json = await res.json();
-      if (json.error) throw new Error(json.error);
-
-      const rows = json.rows || [];
+      const res  = await fetch(`${QUAL_CSV_URL}&t=${Date.now()}`);
+      if (!res.ok) throw new Error(`CSV fetch failed (HTTP ${res.status})`);
+      const text = await res.text();
+      const rows = parseCSV(text);
       if (!rows.length) return;
 
       const keys    = Object.keys(rows[0]);
@@ -1373,11 +1411,10 @@
     setStatus('Loading survey data from VANGUARD Database…', 'loading');
 
     try {
-      const res  = await fetch(`${SCRIPT_URL}?t=${Date.now()}`);
-      const json = await res.json();
-      if (json.error) throw new Error(json.error);
-
-      const rows = json.rows || [];
+      const res  = await fetch(`${CSV_URL}&t=${Date.now()}`);
+      if (!res.ok) throw new Error(`CSV fetch failed (HTTP ${res.status})`);
+      const text = await res.text();
+      const rows = parseCSV(text);
       if (!rows.length) throw new Error('No rows returned — has data collection started yet?');
 
       const keys = Object.keys(rows[0]);
