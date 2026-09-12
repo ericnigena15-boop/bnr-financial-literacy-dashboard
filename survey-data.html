@@ -103,6 +103,7 @@
     /* ── KII roster (categories × stakeholders) ── */
     .kii-roster-grid { display: grid; grid-template-columns: repeat(3,1fr); gap: 14px; }
     .kii-cat-card { background: var(--white); border: 1px solid var(--border); border-radius: 10px; padding: 14px 16px; }
+    .kii-cat-card.done { background: #f0fff4; border-color: #9ae6b4; }
     .kii-cat-title {
       font-family: 'Raleway', sans-serif; font-size: 0.7rem; font-weight: 800;
       text-transform: uppercase; letter-spacing: 0.04em; color: var(--gray);
@@ -1346,9 +1347,12 @@
 
   function renderKiiRoster(completedSet) {
     const container = document.getElementById('kiiRoster');
-    container.innerHTML = Object.entries(KII_ROSTER).map(([category, stakeholders]) => `
-      <div class="kii-cat-card">
-        <div class="kii-cat-title">${category}</div>
+    container.innerHTML = Object.entries(KII_ROSTER).map(([category, stakeholders]) => {
+      const allDone = stakeholders.every(name => completedSet.has(normName(name)));
+      const badge = allDone ? '<span class="v-badge v-badge-done" style="margin-left:8px;">✓ Complete</span>' : '';
+      return `
+      <div class="kii-cat-card${allDone ? ' done' : ''}">
+        <div class="kii-cat-title">${category}${badge}</div>
         ${stakeholders.map(name => {
           const done = completedSet.has(normName(name));
           return `<div class="kii-stakeholder-row">
@@ -1357,7 +1361,8 @@
           </div>`;
         }).join('')}
       </div>
-    `).join('');
+    `;
+    }).join('');
   }
 
   function renderIdiStrata(completedMap) {
