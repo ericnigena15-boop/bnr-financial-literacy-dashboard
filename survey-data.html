@@ -99,6 +99,25 @@
     /* ── KPI grid ── */
     .kpi-grid { display: grid; grid-template-columns: repeat(5,1fr); gap: 14px; margin-bottom: 16px; }
     .qual-kpi-grid { grid-template-columns: repeat(2,1fr); }
+
+    /* ── KII roster (categories × stakeholders) ── */
+    .kii-roster-grid { display: grid; grid-template-columns: repeat(3,1fr); gap: 14px; }
+    .kii-cat-card { background: var(--white); border: 1px solid var(--border); border-radius: 10px; padding: 14px 16px; }
+    .kii-cat-title {
+      font-family: 'Raleway', sans-serif; font-size: 0.7rem; font-weight: 800;
+      text-transform: uppercase; letter-spacing: 0.04em; color: var(--gray);
+      margin-bottom: 10px; line-height: 1.3;
+    }
+    .kii-stakeholder-row { display: flex; align-items: center; gap: 8px; padding: 4px 0; font-size: 0.85rem; color: #2d3748; }
+    .kii-check {
+      width: 18px; height: 18px; border-radius: 50%; flex-shrink: 0;
+      display: flex; align-items: center; justify-content: center;
+      font-size: 11px; font-weight: 800; line-height: 1;
+    }
+    .kii-check.done    { background: var(--blue); color: #fff; }
+    .kii-check.pending { background: #e2e8f0; color: transparent; }
+    @media (max-width: 1100px) { .kii-roster-grid { grid-template-columns: repeat(2,1fr); } }
+    @media (max-width: 700px)  { .kii-roster-grid { grid-template-columns: 1fr; } }
     .kpi-card {
       background: var(--white); border-radius: 10px;
       padding: 16px 18px 14px; box-shadow: 0 1px 5px rgba(0,0,0,0.07);
@@ -558,7 +577,7 @@
       <div style="flex:1;min-width:0;">
         <div class="kpi-label">Key Informant Interviews</div>
         <div class="kpi-value" id="kKii">—</div>
-        <div class="kpi-sub" id="kKiiSub">of 35 target</div>
+        <div class="kpi-sub" id="kKiiSub">of 33 target</div>
         <div class="kpi-track"><div class="kpi-fill" id="kKiiBar" style="width:0"></div></div>
       </div>
     </div>
@@ -567,18 +586,20 @@
       <div style="flex:1;min-width:0;">
         <div class="kpi-label">In-Depth Interviews</div>
         <div class="kpi-value" id="kIdi">—</div>
-        <div class="kpi-sub" id="kIdiSub">of 60 target</div>
+        <div class="kpi-sub" id="kIdiSub">of 45 target</div>
         <div class="kpi-track"><div class="kpi-fill" id="kIdiBar" style="width:0"></div></div>
       </div>
     </div>
   </div>
 
   <div class="dash-card dash-row-1" style="margin-top:16px;">
-    <div class="dash-card-title">
-      Daily Qualitative Progress
-      <span class="dash-card-sub">KIIs &amp; IDIs by date</span>
-    </div>
-    <canvas id="qualDailyChart"></canvas>
+    <div class="dash-card-title">KII Roster by Category</div>
+    <div class="kii-roster-grid" id="kiiRoster"></div>
+  </div>
+
+  <div class="dash-card dash-row-1">
+    <div class="dash-card-title">IDI Progress by Strata</div>
+    <div class="strata-list" id="idiStrataList"></div>
   </div>
 </div><!-- /qualSection -->
 
@@ -613,10 +634,52 @@
   const TOTAL_VILLAGES = 1252;   // 313 sectors × 4 villages/sector
   const STRATA_COLORS  = ['#753918','#f7c35f','#a8632f','#dba13c'];
 
-  // Qualitative (KIIs/IDIs) — separate Google Sheet: submissiondate, idis, kiis
+  // Qualitative (KIIs/IDIs) — same sheet, rows are either a KII row (kiicategories/
+  // stakeholder/kiicompleted filled) or an IDI row (idsstrata/idscompleted filled)
   const QUAL_CSV_URL = atob('aHR0cHM6Ly9kb2NzLmdvb2dsZS5jb20vc3ByZWFkc2hlZXRzL2QvZS8yUEFDWC0xdlJtWEhBb0hKRlZnal9Sakg0eFpMcjVVUWpMbDlMYzkyTS1wMUgyWnZDdDVDWDZTVzB3NWlweHNJbVNDaGpENVJHeXcxdEhxUy1DMmg5OS9wdWI/Z2lkPTE3MzEyMzA4NTMmc2luZ2xlPXRydWUmb3V0cHV0PWNzdg==');
-  const KII_TARGET = 35;
-  const IDI_TARGET = 60;
+
+  // Fixed KII target roster — 7 categories, 33 stakeholders total. Whatever the sheet
+  // says for a name not on this list is ignored; anything on this list not yet marked
+  // completed in the sheet just shows as pending.
+  const KII_ROSTER = {
+    'Cluster 1: Apex Regulators & Policy Architects': [
+      'National Bank of Rwanda (BNR)', 'RSSB', 'MINECOFIN'
+    ],
+    'Cluster 2: Education & Curriculum Bodies': [
+      'MINEDUC', 'Rwanda Education Board (REB)'
+    ],
+    'Cluster 3A: Gender & Youth-focused Institutions': [
+      'MIJEPROF', 'Gender Monitoring Office (GMO)', 'MINIYOUTH'
+    ],
+    'Cluster 3B: Community & Resilience-focused Institutions': [
+      'MINALOC', 'MINEMA'
+    ],
+    'Cluster 4: Financial Sector Associations': [
+      'Rwanda Bankers Association', 'ASSAR_Rwanda Insurer Association', 'Rwanda Cooperative Association',
+      'AMIR_Microfinance', 'Rwanda Fintech Association'
+    ],
+    'Cluster 5: Digital Financial Services Providers': [
+      'MTN MOMO', 'Airtel Money', 'Bank of Kigali', 'Equity Bank'
+    ],
+    'Cluster 6: Development Partners & NGOs': [
+      'Care International', 'AFR', 'World Vision', 'BRAC Rwanda Microfinance Company',
+      'Plan International', 'NUDOR & Handicap International'
+    ],
+    'Cluster 7: Small Business Owners & Informal Sector Operators': [
+      'Gakinjiro Cooperative/Association', 'Nyabugobo Transport Operators Association', 'BDF',
+      'BRD', 'UNCDF', 'LODA', 'IMF', 'RFL'
+    ],
+  };
+  const KII_TARGET = Object.values(KII_ROSTER).flat().length; // 33
+
+  // Fixed IDI strata roster — 9 strata × 5 IDIs each = 45 total target
+  const IDI_STRATA_LIST = [
+    'Youth (In-school)', 'Youth (Out-of-school)',
+    'Working adults – Women 31–60 years', 'Working adults - Men 31–60 years',
+    'Refugees (Camp)', 'Refugees (Host)', 'PWD', 'Retired (65 years and +)', 'MSMEs'
+  ];
+  const IDI_PER_STRATA_TARGET = 5;
+  const IDI_TARGET = IDI_STRATA_LIST.length * IDI_PER_STRATA_TARGET; // 45
   // Display order: paired by age bracket, not grouped by sex. Falls back to
   // alphabetical for any label that doesn't match one of these exactly.
   const STRATA_ORDER = ['Men 16-30', 'Women 16-30', 'Men 31 and above', 'Women 31 and above'];
@@ -1265,7 +1328,6 @@
      QUALITATIVE (KIIs / IDIs) — admin-only tab
   ════════════════════════════════════════════════════ */
   let qualLoaded = false;
-  let qualDailyChart = null;
 
   function switchTab(tab) {
     document.getElementById('tabQuantBtn').classList.toggle('active', tab === 'quant');
@@ -1275,6 +1337,43 @@
     if (tab === 'qual' && !qualLoaded) loadQualData();
   }
 
+  function normName(s) { return String(s ?? '').trim().toLowerCase(); }
+  function isTrueVal(v) { return ['true', 'yes', '1'].includes(String(v ?? '').trim().toLowerCase()); }
+
+  function renderKiiRoster(completedSet) {
+    const container = document.getElementById('kiiRoster');
+    container.innerHTML = Object.entries(KII_ROSTER).map(([category, stakeholders]) => `
+      <div class="kii-cat-card">
+        <div class="kii-cat-title">${category}</div>
+        ${stakeholders.map(name => {
+          const done = completedSet.has(normName(name));
+          return `<div class="kii-stakeholder-row">
+            <span class="kii-check ${done ? 'done' : 'pending'}">${done ? '✓' : ''}</span>
+            <span>${name}</span>
+          </div>`;
+        }).join('')}
+      </div>
+    `).join('');
+  }
+
+  function renderIdiStrata(completedMap) {
+    const container = document.getElementById('idiStrataList');
+    container.innerHTML = IDI_STRATA_LIST.map((strata, i) => {
+      const count = completedMap.get(normName(strata)) || 0;
+      const p = Math.min(100, Math.round(count / IDI_PER_STRATA_TARGET * 100));
+      const color = STRATA_COLORS[i % STRATA_COLORS.length];
+      return `<div>
+        <div class="strata-row-hdr">
+          <span class="strata-name-lbl" style="color:${color}">${strata}</span>
+          <span class="strata-cnt" style="font-size:1rem;">${count} / ${IDI_PER_STRATA_TARGET}</span>
+        </div>
+        <div class="bar-track">
+          <div class="bar-fill" style="width:${p}%;background:${color}"></div>
+        </div>
+      </div>`;
+    }).join('');
+  }
+
   async function loadQualData() {
     qualLoaded = true;
     try {
@@ -1282,27 +1381,30 @@
       if (!res.ok) throw new Error(`CSV fetch failed (HTTP ${res.status})`);
       const text = await res.text();
       const rows = parseCSV(text);
-      if (!rows.length) return;
+      if (!rows.length) { renderKiiRoster(new Set()); renderIdiStrata(new Map()); return; }
 
-      const keys    = Object.keys(rows[0]);
-      const dateKey = findCol(keys, 'submissiondate');
-      const idiKey  = findCol(keys, 'idis');
-      const kiiKey  = findCol(keys, 'kiis');
+      const keys       = Object.keys(rows[0]);
+      const stakeKey    = findCol(keys, 'stakeholders');
+      const kiiDoneKey  = findCol(keys, 'kiicompleted');
+      const idiStrataKey = findCol(keys, 'idsstrata');
+      const idiDoneKey   = findCol(keys, 'idscompleted');
 
-      let totalIdi = 0, totalKii = 0;
-      const byDate = {};
+      const kiiCompletedSet = new Set();
+      const idiCompletedMap = new Map();
       for (const r of rows) {
-        const idi = parseFloat(r[idiKey]) || 0;
-        const kii = parseFloat(r[kiiKey]) || 0;
-        totalIdi += idi;
-        totalKii += kii;
-        const d = dateKey ? toLocalDateStr(r[dateKey]) : '';
-        if (d) {
-          if (!byDate[d]) byDate[d] = { idi: 0, kii: 0 };
-          byDate[d].idi += idi;
-          byDate[d].kii += kii;
+        const stakeholder = stakeKey ? String(r[stakeKey] ?? '').trim() : '';
+        if (stakeholder && kiiDoneKey && isTrueVal(r[kiiDoneKey])) {
+          kiiCompletedSet.add(normName(stakeholder));
+        }
+        const strata = idiStrataKey ? String(r[idiStrataKey] ?? '').trim() : '';
+        if (strata) {
+          const n = idiDoneKey ? (parseFloat(r[idiDoneKey]) || 0) : 0;
+          idiCompletedMap.set(normName(strata), (idiCompletedMap.get(normName(strata)) || 0) + n);
         }
       }
+
+      const totalKii = kiiCompletedSet.size;
+      const totalIdi = [...idiCompletedMap.values()].reduce((a, b) => a + b, 0);
 
       setText('kKii', totalKii.toLocaleString());
       setText('kKiiSub', `of ${KII_TARGET.toLocaleString()} target — ${pct(totalKii, KII_TARGET)}%`);
@@ -1311,46 +1413,8 @@
       setText('kIdiSub', `of ${IDI_TARGET.toLocaleString()} target — ${pct(totalIdi, IDI_TARGET)}%`);
       setWidth('kIdiBar', totalIdi, IDI_TARGET);
 
-      const dates  = Object.keys(byDate).sort();
-      const labels = dates.map(d => {
-        const dt = new Date(d + 'T00:00:00');
-        return isNaN(dt) ? d : dt.toLocaleDateString('en-GB', { day: '2-digit', month: 'short' });
-      });
-      const kiiData = dates.map(d => byDate[d].kii);
-      const idiData = dates.map(d => byDate[d].idi);
-
-      const canvas = document.getElementById('qualDailyChart');
-      if (qualDailyChart) {
-        qualDailyChart.data.labels = labels;
-        qualDailyChart.data.datasets[0].data = kiiData;
-        qualDailyChart.data.datasets[1].data = idiData;
-        qualDailyChart.update();
-      } else {
-        qualDailyChart = new Chart(canvas, {
-          type: 'bar',
-          data: {
-            labels,
-            datasets: [
-              { label: 'KIIs', data: kiiData, backgroundColor: 'rgba(117,57,24,0.85)', borderRadius: 5, borderSkipped: false },
-              { label: 'IDIs', data: idiData, backgroundColor: '#a58530', borderRadius: 5, borderSkipped: false }
-            ]
-          },
-          options: {
-            responsive: true,
-            plugins: {
-              datalabels: { display: false },
-              legend: {
-                position: 'bottom',
-                labels: { font: { size: 11 }, padding: 8, usePointStyle: false, boxWidth: 12, boxHeight: 12 }
-              }
-            },
-            scales: {
-              x: { grid: { display: false }, ticks: { font: { size: 11 } } },
-              y: { beginAtZero: true, grid: { color: '#f0f4f8' }, ticks: { font: { size: 11 } } }
-            }
-          }
-        });
-      }
+      renderKiiRoster(kiiCompletedSet);
+      renderIdiStrata(idiCompletedMap);
     } catch (err) {
       console.error('Qualitative data error:', err);
       qualLoaded = false;
