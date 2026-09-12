@@ -571,6 +571,9 @@
 </div><!-- /dataSection -->
 
 <div id="qualSection" class="data-section">
+  <div class="filter-bar" style="justify-content:flex-end;">
+    <button class="btn-refresh" id="btnRefreshQual" disabled>↻ Refresh</button>
+  </div>
   <div class="kpi-grid qual-kpi-grid">
     <div class="kpi-card" style="display:flex;align-items:center;gap:18px;">
       <img src="KIIs.jpg" alt="" style="width:72px;height:72px;object-fit:contain;border-radius:10px;flex-shrink:0;" />
@@ -696,10 +699,11 @@
   /* ═══════════════════════════════════════════════════
      STATE
   ════════════════════════════════════════════════════ */
-  const banner      = document.getElementById('banner');
-  const bannerText  = document.getElementById('bannerText');
-  const btnRefresh  = document.getElementById('btnRefresh');
-  const dataSection = document.getElementById('dataSection');
+  const banner       = document.getElementById('banner');
+  const bannerText   = document.getElementById('bannerText');
+  const btnRefresh   = document.getElementById('btnRefresh');
+  const btnRefreshQual = document.getElementById('btnRefreshQual');
+  const dataSection  = document.getElementById('dataSection');
 
   let dailyChart   = null;
   let phoneCharts  = { mob: null, smart: null, ins: null, pen: null, fin: null };
@@ -1376,12 +1380,19 @@
 
   async function loadQualData() {
     qualLoaded = true;
+    btnRefreshQual.disabled = true;
+    setStatus('Loading qualitative data from VANGUARD Database…', 'loading');
     try {
       const res  = await fetch(`${QUAL_CSV_URL}&t=${Date.now()}`);
       if (!res.ok) throw new Error(`CSV fetch failed (HTTP ${res.status})`);
       const text = await res.text();
       const rows = parseCSV(text);
-      if (!rows.length) { renderKiiRoster(new Set()); renderIdiStrata(new Map()); return; }
+      if (!rows.length) {
+        renderKiiRoster(new Set());
+        renderIdiStrata(new Map());
+        setStatus('No qualitative rows returned — has tracking started yet?', 'error');
+        return;
+      }
 
       const keys       = Object.keys(rows[0]);
       const stakeKey    = findCol(keys, 'stakeholders');
@@ -1415,14 +1426,19 @@
 
       renderKiiRoster(kiiCompletedSet);
       renderIdiStrata(idiCompletedMap);
+      setStatus(`✓ Qualitative data loaded · ${new Date().toLocaleTimeString()}`, 'ready');
     } catch (err) {
       console.error('Qualitative data error:', err);
       qualLoaded = false;
+      setStatus(`Error: ${err.message}`, 'error');
+    } finally {
+      btnRefreshQual.disabled = false;
     }
   }
 
   document.getElementById('tabQuantBtn').addEventListener('click', () => switchTab('quant'));
   document.getElementById('tabQualBtn').addEventListener('click',  () => switchTab('qual'));
+  btnRefreshQual.addEventListener('click', loadQualData);
 
   /* ═══════════════════════════════════════════════════
      EVENT LISTENERS
