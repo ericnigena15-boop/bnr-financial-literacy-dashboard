@@ -1364,12 +1364,17 @@
     const container = document.getElementById('idiStrataList');
     container.innerHTML = IDI_STRATA_LIST.map((strata, i) => {
       const count = completedMap.get(normName(strata)) || 0;
+      const done  = count >= IDI_PER_STRATA_TARGET;
       const p = Math.min(100, Math.round(count / IDI_PER_STRATA_TARGET * 100));
-      const color = STRATA_COLORS[i % STRATA_COLORS.length];
+      const color = done ? '#276749' : STRATA_COLORS[i % STRATA_COLORS.length];
+      const badge = done ? '<span class="v-badge v-badge-done" style="margin-left:8px;">✓ Complete</span>' : '';
       return `<div>
         <div class="strata-row-hdr">
           <span class="strata-name-lbl" style="color:${color}">${strata}</span>
-          <span class="strata-cnt" style="font-size:1rem;">${count} / ${IDI_PER_STRATA_TARGET}</span>
+          <span>
+            <span class="strata-cnt" style="font-size:1rem;">${count} / ${IDI_PER_STRATA_TARGET}</span>
+            ${badge}
+          </span>
         </div>
         <div class="bar-track">
           <div class="bar-fill" style="width:${p}%;background:${color}"></div>
