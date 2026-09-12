@@ -676,14 +676,20 @@
   };
   const KII_TARGET = Object.values(KII_ROSTER).flat().length; // 33
 
-  // Fixed IDI strata roster — 9 strata × 5 IDIs each = 45 total target
-  const IDI_STRATA_LIST = [
-    'Youth (In-school)', 'Youth (Out-of-school)',
-    'Working adults – Women 31–60 years', 'Working adults - Men 31–60 years',
-    'Refugees (Camp)', 'Refugees (Host)', 'PWD', 'Retired (65 years and +)', 'MSMEs'
-  ];
-  const IDI_PER_STRATA_TARGET = 5;
-  const IDI_TARGET = IDI_STRATA_LIST.length * IDI_PER_STRATA_TARGET; // 45
+  // Fixed IDI strata roster — each stratum has its own target, totalling 60
+  const IDI_STRATA_TARGETS = {
+    'Youth (In-school)': 6,
+    'Youth (Out-of-school)': 7,
+    'Working adults – Women 31–60 years': 8,
+    'Working adults - Men 31–60 years': 8,
+    'Refugees (Camp)': 6,
+    'Refugees (Host)': 5,
+    'PWD': 7,
+    'Retired (65 years and +)': 5,
+    'MSMEs': 8,
+  };
+  const IDI_STRATA_LIST = Object.keys(IDI_STRATA_TARGETS);
+  const IDI_TARGET = Object.values(IDI_STRATA_TARGETS).reduce((a, b) => a + b, 0); // 60
   // Display order: paired by age bracket, not grouped by sex. Falls back to
   // alphabetical for any label that doesn't match one of these exactly.
   const STRATA_ORDER = ['Men 16-30', 'Women 16-30', 'Men 31 and above', 'Women 31 and above'];
@@ -1368,16 +1374,17 @@
   function renderIdiStrata(completedMap) {
     const container = document.getElementById('idiStrataList');
     container.innerHTML = IDI_STRATA_LIST.map((strata, i) => {
+      const target = IDI_STRATA_TARGETS[strata];
       const count = completedMap.get(normName(strata)) || 0;
-      const done  = count >= IDI_PER_STRATA_TARGET;
-      const p = Math.min(100, Math.round(count / IDI_PER_STRATA_TARGET * 100));
+      const done  = count >= target;
+      const p = Math.min(100, Math.round(count / target * 100));
       const color = done ? '#276749' : STRATA_COLORS[i % STRATA_COLORS.length];
       const badge = done ? '<span class="v-badge v-badge-done" style="margin-left:8px;">✓ Complete</span>' : '';
       return `<div>
         <div class="strata-row-hdr">
           <span class="strata-name-lbl" style="color:${color}">${strata}</span>
           <span>
-            <span class="strata-cnt" style="font-size:1rem;">${count} / ${IDI_PER_STRATA_TARGET}</span>
+            <span class="strata-cnt" style="font-size:1rem;">${count} / ${target}</span>
             ${badge}
           </span>
         </div>
