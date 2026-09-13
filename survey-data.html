@@ -396,6 +396,7 @@
       <img src="villages.png" alt="" style="position:absolute;left:16px;top:50%;transform:translateY(-50%);width:40px;height:40px;object-fit:contain;" />
       <div class="kpi-sub" id="kVillSub">of 1,252 villages</div>
       <div class="kpi-track"><div class="kpi-fill" id="kVillBar" style="width:0"></div></div>
+      <div style="margin-top:6px;"><span class="v-badge v-badge-none" id="kSectorsCompleted" style="color:#1a202c;text-transform:uppercase;">Sectors Completed: 0 / 313</span></div>
     </div>
     <div class="kpi-card purple" style="text-align:center;display:flex;flex-direction:column;min-height:180px;position:relative;">
       <div class="kpi-label">Avg Survey Duration</div>
@@ -664,6 +665,8 @@
   const TARGET_STRATA  = 1252;   // per stratum: Men 16-30 / Men 31+ / Women 16-30 / Women 31+
   const TARGET_VILLAGE = 4;      // respondents per village
   const TOTAL_VILLAGES = 1252;   // 313 sectors × 4 villages/sector
+  const TOTAL_SECTORS  = 313;    // a sector is complete once all 4 of its villages are (16 surveys: 4 villages × 4 strata)
+  const VILLAGES_PER_SECTOR = 4;
   const ANTICIPATED_SURVEYS_PER_DAY = 320; // planned pace
   const STRATA_COLORS  = ['#753918','#f7c35f','#a8632f','#dba13c'];
 
@@ -1283,6 +1286,15 @@
       setText('kVill', atTarget);
       setText('kVillSub', `${pct(atTarget, TOTAL_VILLAGES)}% of ${TOTAL_VILLAGES.toLocaleString()} villages`);
       setWidth('kVillBar', atTarget, TOTAL_VILLAGES);
+
+      const sectorMap = {};
+      villageData.forEach(v => {
+        const key = `${v.district}|${v.sector}`;
+        (sectorMap[key] = sectorMap[key] || []).push(v);
+      });
+      const sectorsCompleted = Object.values(sectorMap)
+        .filter(vills => vills.length === VILLAGES_PER_SECTOR && vills.every(v => v.status === 'complete')).length;
+      setText('kSectorsCompleted', `Sectors Completed: ${sectorsCompleted} / ${TOTAL_SECTORS}`);
     } else {
       villageData = []; strataList = [];
       setText('kVill', '—');
