@@ -1434,7 +1434,10 @@
   function renderKiiRoster(completedSet, transcribedSet, translatedSet) {
     const container = document.getElementById('kiiRoster');
     container.innerHTML = Object.entries(KII_ROSTER).map(([category, stakeholders]) => {
-      const allDone = stakeholders.every(name => completedSet.has(normName(name)));
+      const allDone = stakeholders.every(name => {
+        const key = normName(name);
+        return completedSet.has(key) && transcribedSet.has(key) && translatedSet.has(key);
+      });
       const badge = allDone ? '<span class="v-badge v-badge-done" style="margin-left:8px;">✓ Complete</span>' : '';
       return `
       <div class="kii-cat-card${allDone ? ' done' : ''}">
