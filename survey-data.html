@@ -1301,7 +1301,7 @@
         .filter(vills => vills.length === VILLAGES_PER_SECTOR && vills.every(v => v.status === 'complete')).length;
       setText('kSectors', sectorsCompleted);
 
-      setText('kVillSub', `${atTarget.toLocaleString()} / ${TOTAL_VILLAGES.toLocaleString()} villages · ${sectorsCompleted.toLocaleString()} / ${TOTAL_SECTORS.toLocaleString()} sectors`);
+      setText('kVillSub', `${pct(atTarget, TOTAL_VILLAGES)}% of ${TOTAL_VILLAGES.toLocaleString()} villages · ${pct(sectorsCompleted, TOTAL_SECTORS)}% of ${TOTAL_SECTORS.toLocaleString()} sectors`);
     } else {
       villageData = []; strataList = [];
       setText('kVill', '—');
