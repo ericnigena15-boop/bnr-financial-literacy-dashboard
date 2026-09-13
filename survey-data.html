@@ -116,9 +116,22 @@
       font-size: 11px; font-weight: 800; line-height: 1;
     }
     .kii-check.done    { background: var(--blue); color: #fff; }
-    .kii-check.pending { background: #e2e8f0; color: transparent; }
+    .kii-check.pending { background: #e2e8f0; color: #a0aec0; }
+    .kii-status-group  { display: flex; gap: 4px; flex-shrink: 0; }
     @media (max-width: 1100px) { .kii-roster-grid { grid-template-columns: repeat(2,1fr); } }
     @media (max-width: 700px)  { .kii-roster-grid { grid-template-columns: 1fr; } }
+
+    /* ── KPI card branch stats (transcribed / translated) ── */
+    .kpi-branch-row { display: flex; gap: 18px; margin-top: 8px; }
+    .kpi-branch-item { display: flex; align-items: baseline; gap: 5px; }
+    .kpi-branch-num {
+      font-family: 'Arial Narrow', Arial, sans-serif; font-size: 1.15rem;
+      font-weight: 700; color: var(--blue);
+    }
+    .kpi-branch-lbl { font-size: 0.66rem; color: var(--gray); text-transform: uppercase; letter-spacing: 0.03em; }
+
+    .strata-substats { font-size: 0.72rem; color: var(--gray); margin-top: 5px; }
+    .strata-substats b { color: #2d3748; }
     .kpi-card {
       background: var(--white); border-radius: 10px;
       padding: 16px 18px 14px; box-shadow: 0 1px 5px rgba(0,0,0,0.07);
@@ -614,6 +627,10 @@
         <div class="kpi-value" id="kKii">—</div>
         <div class="kpi-sub" id="kKiiSub">of 33 target</div>
         <div class="kpi-track"><div class="kpi-fill" id="kKiiBar" style="width:0"></div></div>
+        <div class="kpi-branch-row">
+          <div class="kpi-branch-item"><span class="kpi-branch-num" id="kKiiTranscribed">—</span><span class="kpi-branch-lbl">Transcribed</span></div>
+          <div class="kpi-branch-item"><span class="kpi-branch-num" id="kKiiTranslated">—</span><span class="kpi-branch-lbl">Translated</span></div>
+        </div>
       </div>
     </div>
     <div class="kpi-card green" style="display:flex;align-items:center;gap:18px;">
@@ -623,6 +640,10 @@
         <div class="kpi-value" id="kIdi">—</div>
         <div class="kpi-sub" id="kIdiSub">of 45 target</div>
         <div class="kpi-track"><div class="kpi-fill" id="kIdiBar" style="width:0"></div></div>
+        <div class="kpi-branch-row">
+          <div class="kpi-branch-item"><span class="kpi-branch-num" id="kIdiTranscribed">—</span><span class="kpi-branch-lbl">Transcribed</span></div>
+          <div class="kpi-branch-item"><span class="kpi-branch-num" id="kIdiTranslated">—</span><span class="kpi-branch-lbl">Translated</span></div>
+        </div>
       </div>
     </div>
   </div>
@@ -1400,7 +1421,7 @@
   function normName(s) { return String(s ?? '').trim().toLowerCase(); }
   function isTrueVal(v) { return ['true', 'yes', '1'].includes(String(v ?? '').trim().toLowerCase()); }
 
-  function renderKiiRoster(completedSet) {
+  function renderKiiRoster(completedSet, transcribedSet, translatedSet) {
     const container = document.getElementById('kiiRoster');
     container.innerHTML = Object.entries(KII_ROSTER).map(([category, stakeholders]) => {
       const allDone = stakeholders.every(name => completedSet.has(normName(name)));
@@ -1409,9 +1430,16 @@
       <div class="kii-cat-card${allDone ? ' done' : ''}">
         <div class="kii-cat-title">${category}${badge}</div>
         ${stakeholders.map(name => {
-          const done = completedSet.has(normName(name));
+          const key = normName(name);
+          const done       = completedSet.has(key);
+          const transcribed = transcribedSet.has(key);
+          const translated  = translatedSet.has(key);
           return `<div class="kii-stakeholder-row">
-            <span class="kii-check ${done ? 'done' : 'pending'}">${done ? '✓' : ''}</span>
+            <span class="kii-status-group">
+              <span class="kii-check ${done ? 'done' : 'pending'}" title="Completed">✓</span>
+              <span class="kii-check ${transcribed ? 'done' : 'pending'}" title="Transcribed">T</span>
+              <span class="kii-check ${translated ? 'done' : 'pending'}" title="Translated">L</span>
+            </span>
             <span>${name}</span>
           </div>`;
         }).join('')}
@@ -1420,11 +1448,14 @@
     }).join('');
   }
 
-  function renderIdiStrata(completedMap) {
+  function renderIdiStrata(completedMap, transcribedMap, translatedMap) {
     const container = document.getElementById('idiStrataList');
     container.innerHTML = IDI_STRATA_LIST.map((strata, i) => {
       const target = IDI_STRATA_TARGETS[strata];
-      const count = completedMap.get(normName(strata)) || 0;
+      const key = normName(strata);
+      const count       = completedMap.get(key) || 0;
+      const transcribed = transcribedMap.get(key) || 0;
+      const translated  = translatedMap.get(key) || 0;
       const done  = count >= target;
       const p = Math.min(100, Math.round(count / target * 100));
       const color = done ? '#276749' : STRATA_COLORS[i % STRATA_COLORS.length];
@@ -1440,6 +1471,7 @@
         <div class="bar-track">
           <div class="bar-fill" style="width:${p}%;background:${color}"></div>
         </div>
+        <div class="strata-substats">Transcribed: <b>${transcribed}</b> · Translated: <b>${translated}</b></div>
       </div>`;
     }).join('');
   }
@@ -1454,8 +1486,8 @@
       const text = await res.text();
       const rows = parseCSV(text);
       if (!rows.length) {
-        renderKiiRoster(new Set());
-        renderIdiStrata(new Map());
+        renderKiiRoster(new Set(), new Set(), new Set());
+        renderIdiStrata(new Map(), new Map(), new Map());
         setStatus('No qualitative rows returned — has tracking started yet?', 'error');
         return;
       }
@@ -1463,35 +1495,60 @@
       const keys       = Object.keys(rows[0]);
       const stakeKey    = findCol(keys, 'stakeholders');
       const kiiDoneKey  = findCol(keys, 'kiicompleted');
+      const kiiTransKey = findCol(keys, 'kiitranscribed');
+      const kiiTranslKey = findCol(keys, 'kiitranslated');
       const idiStrataKey = findCol(keys, 'idsstrata');
       const idiDoneKey   = findCol(keys, 'idscompleted');
+      const idiTransKey  = findCol(keys, 'idistranscribed');
+      const idiTranslKey = findCol(keys, 'idistranslated');
 
-      const kiiCompletedSet = new Set();
-      const idiCompletedMap = new Map();
+      const kiiCompletedSet  = new Set();
+      const kiiTranscribedSet = new Set();
+      const kiiTranslatedSet  = new Set();
+      const idiCompletedMap  = new Map();
+      const idiTranscribedMap = new Map();
+      const idiTranslatedMap  = new Map();
       for (const r of rows) {
         const stakeholder = stakeKey ? String(r[stakeKey] ?? '').trim() : '';
-        if (stakeholder && kiiDoneKey && isTrueVal(r[kiiDoneKey])) {
-          kiiCompletedSet.add(normName(stakeholder));
+        if (stakeholder) {
+          const key = normName(stakeholder);
+          if (kiiDoneKey && isTrueVal(r[kiiDoneKey])) kiiCompletedSet.add(key);
+          if (kiiTransKey && isTrueVal(r[kiiTransKey])) kiiTranscribedSet.add(key);
+          if (kiiTranslKey && isTrueVal(r[kiiTranslKey])) kiiTranslatedSet.add(key);
         }
         const strata = idiStrataKey ? String(r[idiStrataKey] ?? '').trim() : '';
         if (strata) {
-          const n = idiDoneKey ? (parseFloat(r[idiDoneKey]) || 0) : 0;
-          idiCompletedMap.set(normName(strata), (idiCompletedMap.get(normName(strata)) || 0) + n);
+          const key = normName(strata);
+          const nDone  = idiDoneKey ? (parseFloat(r[idiDoneKey]) || 0) : 0;
+          const nTrans = idiTransKey ? (parseFloat(r[idiTransKey]) || 0) : 0;
+          const nTransl = idiTranslKey ? (parseFloat(r[idiTranslKey]) || 0) : 0;
+          idiCompletedMap.set(key, (idiCompletedMap.get(key) || 0) + nDone);
+          idiTranscribedMap.set(key, (idiTranscribedMap.get(key) || 0) + nTrans);
+          idiTranslatedMap.set(key, (idiTranslatedMap.get(key) || 0) + nTransl);
         }
       }
 
       const totalKii = kiiCompletedSet.size;
       const totalIdi = [...idiCompletedMap.values()].reduce((a, b) => a + b, 0);
+      const totalKiiTranscribed = kiiTranscribedSet.size;
+      const totalKiiTranslated  = kiiTranslatedSet.size;
+      const totalIdiTranscribed = [...idiTranscribedMap.values()].reduce((a, b) => a + b, 0);
+      const totalIdiTranslated  = [...idiTranslatedMap.values()].reduce((a, b) => a + b, 0);
 
       setText('kKii', totalKii.toLocaleString());
       setText('kKiiSub', `of ${KII_TARGET.toLocaleString()} target — ${pct(totalKii, KII_TARGET)}%`);
       setWidth('kKiiBar', totalKii, KII_TARGET);
+      setText('kKiiTranscribed', totalKiiTranscribed.toLocaleString());
+      setText('kKiiTranslated', totalKiiTranslated.toLocaleString());
+
       setText('kIdi', totalIdi.toLocaleString());
       setText('kIdiSub', `of ${IDI_TARGET.toLocaleString()} target — ${pct(totalIdi, IDI_TARGET)}%`);
       setWidth('kIdiBar', totalIdi, IDI_TARGET);
+      setText('kIdiTranscribed', totalIdiTranscribed.toLocaleString());
+      setText('kIdiTranslated', totalIdiTranslated.toLocaleString());
 
-      renderKiiRoster(kiiCompletedSet);
-      renderIdiStrata(idiCompletedMap);
+      renderKiiRoster(kiiCompletedSet, kiiTranscribedSet, kiiTranslatedSet);
+      renderIdiStrata(idiCompletedMap, idiTranscribedMap, idiTranslatedMap);
       setStatus(`✓ Qualitative data loaded · ${new Date().toLocaleTimeString()}`, 'ready');
     } catch (err) {
       console.error('Qualitative data error:', err);
