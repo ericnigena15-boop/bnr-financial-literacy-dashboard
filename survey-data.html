@@ -242,6 +242,12 @@
     .strata-tick-col { text-align: center; min-width: 60px; font-size: 0.8rem; font-weight: 700; }
     .tick-done { color: #276749; }
     .tick-miss { color: #e53e3e; font-family: 'Arial Narrow', Arial, sans-serif; }
+    .task-mark {
+      display: inline-block; margin-left: 6px; padding: 1px 6px;
+      border-radius: 4px; font-size: 0.7rem; font-weight: 800;
+    }
+    .task-mark.reached { background: #c6f6d5; color: #276749; }
+    .task-mark.partial { background: var(--blue-light); color: var(--blue-dark); }
 
     /* ── Enumerator table (wide, horizontal scroll) ── */
     #enumScroll {
@@ -1460,8 +1466,8 @@
   }
 
   function taskMark(value, target) {
-    if (value >= target) return ' ✓';
-    if (value > 0) return ' …';
+    if (value >= target) return '<span class="task-mark reached">✓</span>';
+    if (value > 0) return '<span class="task-mark partial">…</span>';
     return '';
   }
 
