@@ -285,6 +285,7 @@
       .kpi-grid   { grid-template-columns: 1fr 1fr; }
       .dash-row-2 { grid-template-columns: 1fr; }
       .dash-row-3 { grid-template-columns: 1fr; }
+      .about-stats-grid { grid-template-columns: 1fr 1fr; }
     }
     @media (max-width: 520px) {
       .kpi-grid { grid-template-columns: 1fr; }
@@ -293,6 +294,7 @@
       .qual-tabs { flex-wrap: wrap; }
       .filter-select { min-width: 120px; }
       #extraStatsBar { justify-content: center; }
+      .about-stats-grid { grid-template-columns: 1fr; }
     }
 
   </style>
@@ -312,6 +314,31 @@
 </div>
 
 <div id="dataSection" class="data-section">
+
+  <!-- About / planned targets intro card -->
+  <div class="dash-card dash-row-1">
+    <div class="dash-card-title">About This Dashboard</div>
+    <p style="font-size:0.85rem;color:#4a5568;line-height:1.6;max-width:900px;margin:0 auto 18px;text-align:center;">
+      This dashboard tracks real-time progress of the <em>Financial Literacy &amp; Financial Well-Being Survey 2026</em>,
+      conducted by Vanguard Economics on behalf of the National Bank of Rwanda (BNR). It covers two components: a
+      large-scale household survey (Quantitative tab) and a set of stakeholder interviews (Qualitative tab). The
+      figures below reflect what was planned before fieldwork began, so progress shown throughout the dashboard can
+      be read against a clear target.
+    </p>
+    <div class="dash-card-sub" style="text-align:center;font-weight:700;color:#2d3748;margin-bottom:10px;">Survey Design &amp; Targets</div>
+    <div class="about-stats-grid" style="display:grid;grid-template-columns:repeat(3,1fr);gap:14px;font-size:0.85rem;">
+      <div style="text-align:center;"><div style="color:var(--gray);font-size:0.72rem;text-transform:uppercase;letter-spacing:0.04em;">Total Surveys Anticipated</div><div style="font-weight:800;color:var(--blue);font-size:1.1rem;">5,008 respondents</div></div>
+      <div style="text-align:center;"><div style="color:var(--gray);font-size:0.72rem;text-transform:uppercase;letter-spacing:0.04em;">Surveys Anticipated / Day</div><div style="font-weight:800;color:var(--blue);font-size:1.1rem;">320</div></div>
+      <div style="text-align:center;"><div style="color:var(--gray);font-size:0.72rem;text-transform:uppercase;letter-spacing:0.04em;">Expected Avg Duration</div><div style="font-weight:800;color:var(--blue);font-size:1.1rem;">50 minutes</div></div>
+      <div style="text-align:center;"><div style="color:var(--gray);font-size:0.72rem;text-transform:uppercase;letter-spacing:0.04em;">Enumerators Anticipated</div><div style="font-weight:800;color:var(--blue);font-size:1.1rem;">42</div></div>
+      <div style="text-align:center;"><div style="color:var(--gray);font-size:0.72rem;text-transform:uppercase;letter-spacing:0.04em;">Sectors Anticipated</div><div style="font-weight:800;color:var(--blue);font-size:1.1rem;">313 sectors (1,252 villages)</div></div>
+      <div style="text-align:center;"><div style="color:var(--gray);font-size:0.72rem;text-transform:uppercase;letter-spacing:0.04em;">Surveys Anticipated / Stratum</div><div style="font-weight:800;color:var(--blue);font-size:1.1rem;">1,252 each</div></div>
+    </div>
+    <p style="font-size:0.78rem;color:var(--gray);text-align:center;margin-top:16px;">
+      For the qualitative component: <strong>33</strong> Key Informant Interviews across 7 institutional categories,
+      and <strong>60</strong> In-Depth Interviews across 9 population strata — tracked on the Qualitative tab.
+    </p>
+  </div>
 
   <!-- Date filter bar -->
   <div class="filter-bar">
