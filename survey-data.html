@@ -130,8 +130,14 @@
     }
     .kpi-branch-lbl { font-size: 0.66rem; color: var(--gray); text-transform: uppercase; letter-spacing: 0.03em; }
 
-    .strata-substats { font-size: 0.72rem; color: var(--gray); margin-top: 5px; }
-    .strata-substats b { color: #2d3748; }
+    .strata-cols { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; margin-top: 8px; }
+    .strata-col {
+      background: #f7fafc; border: 1px solid var(--border); border-radius: 6px;
+      padding: 5px 10px; text-align: center;
+      display: flex; flex-direction: column; align-items: center; gap: 2px;
+    }
+    .strata-col-num { font-family: 'Arial Narrow', Arial, sans-serif; font-size: 1rem; font-weight: 700; color: #2d3748; }
+    .strata-col-lbl { font-size: 0.65rem; color: var(--gray); text-transform: uppercase; letter-spacing: 0.03em; }
     .kpi-card {
       background: var(--white); border-radius: 10px;
       padding: 16px 18px 14px; box-shadow: 0 1px 5px rgba(0,0,0,0.07);
@@ -1471,7 +1477,10 @@
         <div class="bar-track">
           <div class="bar-fill" style="width:${p}%;background:${color}"></div>
         </div>
-        <div class="strata-substats">Transcribed: <b>${transcribed}</b> · Translated: <b>${translated}</b></div>
+        <div class="strata-cols">
+          <div class="strata-col"><span class="strata-col-num">${transcribed}</span><span class="strata-col-lbl">Transcribed</span></div>
+          <div class="strata-col"><span class="strata-col-num">${translated}</span><span class="strata-col-lbl">Translated</span></div>
+        </div>
       </div>`;
     }).join('');
   }
