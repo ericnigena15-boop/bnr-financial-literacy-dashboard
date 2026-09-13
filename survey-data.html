@@ -390,13 +390,20 @@
       <img src="SMEs%20icon.png" alt="" style="position:absolute;left:16px;top:50%;transform:translateY(-50%);width:40px;height:40px;object-fit:contain;" />
       <div class="kpi-sub" id="kMsmeSub"></div>
     </div>
-    <div class="kpi-card yellow" style="text-align:center;display:flex;flex-direction:column;min-height:180px;position:relative;">
-      <div class="kpi-label">Villages Completed</div>
-      <div class="kpi-value" id="kVill" style="color:var(--blue);flex:1;display:flex;align-items:center;justify-content:center;font-family:'Arial Narrow',Arial,sans-serif;font-weight:700;">—</div>
-      <img src="villages.png" alt="" style="position:absolute;left:16px;top:50%;transform:translateY(-50%);width:40px;height:40px;object-fit:contain;" />
-      <div class="kpi-sub" id="kVillSub">of 1,252 villages</div>
-      <div class="kpi-track"><div class="kpi-fill" id="kVillBar" style="width:0"></div></div>
-      <div style="margin-top:6px;"><span class="v-badge v-badge-none" id="kSectorsCompleted" style="color:#1a202c;text-transform:uppercase;">Sectors Completed: 0 / 313</span></div>
+    <div class="kpi-card yellow" style="text-align:center;display:flex;flex-direction:column;min-height:180px;">
+      <div class="kpi-label">Villages &amp; Sectors Completed</div>
+      <div style="display:flex;align-items:center;justify-content:center;gap:22px;flex:1;">
+        <div>
+          <div class="kpi-value" id="kVill" style="color:var(--blue);font-size:1.9rem;font-family:'Arial Narrow',Arial,sans-serif;font-weight:700;">—</div>
+          <div style="font-size:0.68rem;color:var(--gray);text-transform:uppercase;letter-spacing:0.04em;margin-top:2px;">Villages</div>
+        </div>
+        <img src="villages.png" alt="" style="width:44px;height:44px;object-fit:contain;flex-shrink:0;" />
+        <div>
+          <div class="kpi-value" id="kSectors" style="color:var(--blue);font-size:1.9rem;font-family:'Arial Narrow',Arial,sans-serif;font-weight:700;">—</div>
+          <div style="font-size:0.68rem;color:var(--gray);text-transform:uppercase;letter-spacing:0.04em;margin-top:2px;">Sectors</div>
+        </div>
+      </div>
+      <div class="kpi-sub" id="kVillSub">of 1,252 villages / 313 sectors</div>
     </div>
     <div class="kpi-card purple" style="text-align:center;display:flex;flex-direction:column;min-height:180px;position:relative;">
       <div class="kpi-label">Avg Survey Duration</div>
@@ -1284,8 +1291,6 @@
       });
       const atTarget = villageData.filter(v => v.status === 'complete').length;
       setText('kVill', atTarget);
-      setText('kVillSub', `${pct(atTarget, TOTAL_VILLAGES)}% of ${TOTAL_VILLAGES.toLocaleString()} villages`);
-      setWidth('kVillBar', atTarget, TOTAL_VILLAGES);
 
       const sectorMap = {};
       villageData.forEach(v => {
@@ -1294,10 +1299,13 @@
       });
       const sectorsCompleted = Object.values(sectorMap)
         .filter(vills => vills.length === VILLAGES_PER_SECTOR && vills.every(v => v.status === 'complete')).length;
-      setText('kSectorsCompleted', `Sectors Completed: ${sectorsCompleted} / ${TOTAL_SECTORS}`);
+      setText('kSectors', sectorsCompleted);
+
+      setText('kVillSub', `${atTarget.toLocaleString()} / ${TOTAL_VILLAGES.toLocaleString()} villages · ${sectorsCompleted.toLocaleString()} / ${TOTAL_SECTORS.toLocaleString()} sectors`);
     } else {
       villageData = []; strataList = [];
       setText('kVill', '—');
+      setText('kSectors', '—');
       setText('kVillSub', 'mob_village column not found');
     }
 
