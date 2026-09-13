@@ -130,15 +130,6 @@
     }
     .kpi-branch-lbl { font-size: 0.66rem; color: var(--gray); text-transform: uppercase; letter-spacing: 0.03em; }
 
-    .strata-cols { display: grid; grid-template-columns: repeat(3,1fr); gap: 8px; margin-top: 8px; }
-    .strata-col {
-      background: #f7fafc; border: 1px solid var(--border); border-radius: 6px;
-      padding: 5px 6px; text-align: center;
-      display: flex; flex-direction: column; align-items: center; gap: 2px;
-    }
-    .strata-col-num { font-family: 'Arial Narrow', Arial, sans-serif; font-size: 0.92rem; font-weight: 700; color: #2d3748; white-space: nowrap; }
-    .strata-col-lbl { font-size: 0.62rem; color: var(--gray); text-transform: uppercase; letter-spacing: 0.03em; }
-    @media (max-width: 700px) { .strata-cols { grid-template-columns: 1fr; } }
     .kpi-card {
       background: var(--white); border-radius: 10px;
       padding: 16px 18px 14px; box-shadow: 0 1px 5px rgba(0,0,0,0.07);
@@ -662,7 +653,20 @@
 
   <div class="dash-card dash-row-1">
     <div class="dash-card-title">IDI Progress by Strata</div>
-    <div class="strata-list" id="idiStrataList"></div>
+    <div class="tbl-scroll">
+      <table>
+        <thead>
+          <tr>
+            <th>IDI Cluster</th>
+            <th style="text-align:right">Done</th>
+            <th style="text-align:right">Transcribed</th>
+            <th style="text-align:right">Translated</th>
+            <th>Status</th>
+          </tr>
+        </thead>
+        <tbody id="idiStrataList"></tbody>
+      </table>
+    </div>
   </div>
 </div><!-- /qualSection -->
 
@@ -1457,30 +1461,22 @@
 
   function renderIdiStrata(completedMap, transcribedMap, translatedMap) {
     const container = document.getElementById('idiStrataList');
-    container.innerHTML = IDI_STRATA_LIST.map((strata, i) => {
+    container.innerHTML = IDI_STRATA_LIST.map(strata => {
       const target = IDI_STRATA_TARGETS[strata];
       const key = normName(strata);
       const count       = completedMap.get(key) || 0;
       const transcribed = transcribedMap.get(key) || 0;
       const translated  = translatedMap.get(key) || 0;
       const done = count >= target && transcribed >= target && translated >= target;
-      const p = Math.min(100, Math.round(count / target * 100));
-      const color = done ? '#276749' : STRATA_COLORS[i % STRATA_COLORS.length];
-      const badge = done ? '<span class="v-badge v-badge-done" style="margin-left:8px;">✓ Complete</span>' : '';
-      return `<div>
-        <div class="strata-row-hdr">
-          <span class="strata-name-lbl" style="color:${color}">${strata}</span>
-          <span>${badge}</span>
-        </div>
-        <div class="bar-track">
-          <div class="bar-fill" style="width:${p}%;background:${color}"></div>
-        </div>
-        <div class="strata-cols">
-          <div class="strata-col"><span class="strata-col-num">${count} / ${target}</span><span class="strata-col-lbl">Interview Done</span></div>
-          <div class="strata-col"><span class="strata-col-num">${transcribed} / ${target}</span><span class="strata-col-lbl">Transcribed</span></div>
-          <div class="strata-col"><span class="strata-col-num">${translated} / ${target}</span><span class="strata-col-lbl">Translated</span></div>
-        </div>
-      </div>`;
+      const badgeClass = done ? 'v-badge-done' : 'v-badge-none';
+      const badgeText  = done ? '✓ Complete' : 'In progress';
+      return `<tr>
+        <td class="vname">${strata}</td>
+        <td style="text-align:right">${count} / ${target}</td>
+        <td style="text-align:right">${transcribed} / ${target}</td>
+        <td style="text-align:right">${translated} / ${target}</td>
+        <td><span class="v-badge ${badgeClass}">${badgeText}</span></td>
+      </tr>`;
     }).join('');
   }
 
