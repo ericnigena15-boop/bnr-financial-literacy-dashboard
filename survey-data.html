@@ -1459,6 +1459,12 @@
     }).join('');
   }
 
+  function taskMark(value, target) {
+    if (value >= target) return ' ✓';
+    if (value > 0) return ' …';
+    return '';
+  }
+
   function renderIdiStrata(completedMap, transcribedMap, translatedMap) {
     const container = document.getElementById('idiStrataList');
     container.innerHTML = IDI_STRATA_LIST.map(strata => {
@@ -1467,14 +1473,15 @@
       const count       = completedMap.get(key) || 0;
       const transcribed = transcribedMap.get(key) || 0;
       const translated  = translatedMap.get(key) || 0;
-      const done = count >= target && transcribed >= target && translated >= target;
-      const badgeClass = done ? 'v-badge-done' : 'v-badge-none';
-      const badgeText  = done ? '✓ Complete' : 'In progress';
+      const allDone   = count >= target && transcribed >= target && translated >= target;
+      const notStarted = count === 0;
+      const badgeClass = allDone ? 'v-badge-done' : notStarted ? 'v-badge-none' : 'v-badge-prog';
+      const badgeText  = allDone ? '✓ Completed' : notStarted ? 'No task started yet' : 'In progress';
       return `<tr>
         <td class="vname">${strata}</td>
-        <td style="text-align:right">${count} / ${target}</td>
-        <td style="text-align:right">${transcribed} / ${target}</td>
-        <td style="text-align:right">${translated} / ${target}</td>
+        <td style="text-align:right">${count} / ${target}${taskMark(count, target)}</td>
+        <td style="text-align:right">${transcribed} / ${target}${taskMark(transcribed, target)}</td>
+        <td style="text-align:right">${translated} / ${target}${taskMark(translated, target)}</td>
         <td><span class="v-badge ${badgeClass}">${badgeText}</span></td>
       </tr>`;
     }).join('');
