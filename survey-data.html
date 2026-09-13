@@ -376,6 +376,7 @@
       <img src="check-mark.jpg" alt="" style="position:absolute;left:16px;top:50%;transform:translateY(-50%);width:56px;height:56px;object-fit:contain;" />
       <div class="kpi-sub" id="kTotalSub">of 5,008 target</div>
       <div class="kpi-track"><div class="kpi-fill" id="kTotalBar" style="width:0"></div></div>
+      <div style="margin-top:6px;"><span class="v-badge v-badge-none" id="kTotalAnticipated">Anticipated surveys in 0 days: 0 surveys</span></div>
     </div>
     <div class="kpi-card" style="text-align:center;display:flex;flex-direction:column;min-height:180px;position:relative;">
       <div class="kpi-label">Persons with Disabilities</div>
@@ -663,6 +664,7 @@
   const TARGET_STRATA  = 1252;   // per stratum: Men 16-30 / Men 31+ / Women 16-30 / Women 31+
   const TARGET_VILLAGE = 4;      // respondents per village
   const TOTAL_VILLAGES = 1252;   // 313 sectors × 4 villages/sector
+  const ANTICIPATED_SURVEYS_PER_DAY = 320; // planned pace
   const STRATA_COLORS  = ['#753918','#f7c35f','#a8632f','#dba13c'];
 
   // Qualitative (KIIs/IDIs) — same sheet, rows are either a KII row (kiicategories/
@@ -1224,6 +1226,10 @@
     setText('kTotal', total.toLocaleString());
     document.getElementById('kTotalSub').innerHTML = `of ${TARGET_TOTAL.toLocaleString()} target (<strong style="color:#1a202c">${pct(total, TARGET_TOTAL)}%</strong>)`;
     setWidth('kTotalBar', total, TARGET_TOTAL);
+
+    const daysDone = ck.date ? new Set(rows.map(r => toLocalDateStr(r[ck.date])).filter(Boolean)).size : 0;
+    const anticipatedSoFar = ANTICIPATED_SURVEYS_PER_DAY * daysDone;
+    setText('kTotalAnticipated', `Anticipated surveys in ${daysDone} day${daysDone !== 1 ? 's' : ''}: ${anticipatedSoFar.toLocaleString()} surveys`);
 
     const isYes = v => ['yes','true','1'].includes(String(v ?? '').trim().toLowerCase());
     const pwdCount  = ck.pwd  ? rows.filter(r => isYes(r[ck.pwd])).length  : 0;
