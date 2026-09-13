@@ -400,8 +400,7 @@
       <div class="kpi-label">Avg Survey Duration</div>
       <div class="kpi-value" id="kAvgDur" style="color:var(--blue);flex:1;display:flex;align-items:center;justify-content:center;font-family:'Arial Narrow',Arial,sans-serif;font-weight:700;">—</div>
       <img src="Watch.png" alt="" style="position:absolute;left:16px;top:50%;transform:translateY(-50%);width:40px;height:40px;object-fit:contain;" />
-      <div class="kpi-sub" id="kAvgDurSub">min / survey (all enumerators)</div>
-      <div class="kpi-track"><div class="kpi-fill" id="kAvgDurBar" style="width:0"></div></div>
+      <div class="kpi-sub" id="kAvgDurSub">min / survey — anticipated 50 min</div>
     </div>
   </div>
 
@@ -663,6 +662,7 @@
   const TARGET_STRATA  = 1252;   // per stratum: Men 16-30 / Men 31+ / Women 16-30 / Women 31+
   const TARGET_VILLAGE = 4;      // respondents per village
   const TOTAL_VILLAGES = 1252;   // 313 sectors × 4 villages/sector
+  const ANTICIPATED_AVG_DURATION = 50; // minutes, per the planned survey design
   const STRATA_COLORS  = ['#753918','#f7c35f','#a8632f','#dba13c'];
 
   // Qualitative (KIIs/IDIs) — same sheet, rows are either a KII row (kiicategories/
@@ -1342,9 +1342,9 @@
       // Overall average (weighted — across all individual surveys, not mean-of-means)
       const overallAvgMin = grandDurCount > 0 ? grandDurTotal / grandDurCount : null;
       setText('kAvgDur', overallAvgMin != null ? overallAvgMin.toFixed(1) : '—');
-      setText('kAvgDurSub', grandDurCount > 0 ? 'min / survey' : 'no duration data');
-      // Bar: reference 120 min as "full" for the progress bar
-      setWidth('kAvgDurBar', overallAvgMin ?? 0, 120);
+      setText('kAvgDurSub', grandDurCount > 0
+        ? `min / survey — anticipated ${ANTICIPATED_AVG_DURATION} min`
+        : 'no duration data');
 
       overallRow = {
         surveys: grandDurCount,
