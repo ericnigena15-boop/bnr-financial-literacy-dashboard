@@ -1281,10 +1281,15 @@
     setText('kMsme', ck.msme ? msmeCount.toLocaleString() : '—');
     setText('kMsmeSub', ck.msme ? `${pct(msmeCount, total)}% of respondents` : 'business_owner column not found');
 
-    const finKnowCount  = ck.finKnow  ? rows.filter(r => isYes(r[ck.finKnow])).length  : 0;
+    // financial_knowledge_score holds each respondent's actual literacy percentage
+    // (not a yes/no flag), so the card shows the average score, not a yes-count.
+    const finKnowVals = ck.finKnow ? rows.map(r => parseFloat(r[ck.finKnow])).filter(v => !isNaN(v)) : [];
+    const finKnowAvg  = finKnowVals.length ? finKnowVals.reduce((a, b) => a + b, 0) / finKnowVals.length : 0;
+    const finKnowPct  = finKnowAvg <= 1 ? finKnowAvg * 100 : finKnowAvg; // tolerate 0–1 fractions or 0–100 scores
+
     const emergCount    = ck.emergCap ? rows.filter(r => isYes(r[ck.emergCap])).length : 0;
     const consumerCount = ck.consumerAware ? rows.filter(r => isYes(r[ck.consumerAware])).length : 0;
-    setText('kFinKnow',  ck.finKnow       ? `${pct(finKnowCount, total)}%`  : '—');
+    setText('kFinKnow',  ck.finKnow       ? `${fmt(finKnowPct)}%`  : '—');
     setText('kEmerg',    ck.emergCap      ? `${pct(emergCount, total)}%`   : '—');
     setText('kConsumer', ck.consumerAware ? `${pct(consumerCount, total)}%` : '—');
 
