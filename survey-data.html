@@ -554,15 +554,11 @@
     </div>
   </div>
 
-  <!-- Floating summary bar: financial knowledge / digital financial knowledge / emergency expense capacity / consumer rights awareness -->
+  <!-- Floating summary bar: financial knowledge / emergency expense capacity / consumer rights awareness -->
   <div class="dash-card dash-row-1" id="extraStatsBar" style="display:flex;justify-content:space-around;align-items:center;flex-wrap:wrap;gap:16px;box-shadow:0 4px 16px rgba(0,0,0,0.12);background:#fcf7ea;">
     <div style="text-align:center;">
       <div class="kpi-label">Financial Knowledge</div>
       <div class="kpi-value" id="kFinKnow" style="font-size:1.6rem;color:#f7c35f;">—</div>
-    </div>
-    <div style="text-align:center;">
-      <div class="kpi-label">Digital Financial Knowledge</div>
-      <div class="kpi-value" id="kDigitalKnow" style="font-size:1.6rem;color:#f7c35f;">—</div>
     </div>
     <div style="text-align:center;">
       <div class="kpi-label">Emergency Expense Capacity</div>
@@ -1305,20 +1301,15 @@
     setText('kRefugee', ck.refugee ? refugeeCount.toLocaleString() : '—');
     setText('kRefugeeSub', ck.refugee ? `${pct(refugeeCount, total)}% of respondents` : 'registered_refugee column not found');
 
-    // financial_knowledge_score (OECD core financial knowledge) and digital_knowledge_pct
-    // (digital financial knowledge) hold each respondent's actual score, not a yes/no
-    // flag, so both cards average the numeric values rather than counting yes-rows.
+    // financial_knowledge_score holds each respondent's actual literacy percentage
+    // (not a yes/no flag), so the card shows the average score, not a yes-count.
     const finKnowVals = ck.finKnow ? rows.map(r => parseFloat(r[ck.finKnow])).filter(v => !isNaN(v)) : [];
     const finKnowAvg  = finKnowVals.length ? finKnowVals.reduce((a, b) => a + b, 0) / finKnowVals.length : 0;
     const finKnowPct  = finKnowAvg <= 1 ? finKnowAvg * 100 : finKnowAvg; // tolerate 0–1 fractions or 0–100 scores
 
-    const digitalKnowVals = ck.digitalKnow ? rows.map(r => parseFloat(r[ck.digitalKnow])).filter(v => !isNaN(v)) : [];
-    const digitalKnowAvg  = digitalKnowVals.length ? digitalKnowVals.reduce((a, b) => a + b, 0) / digitalKnowVals.length : 0;
-
     const emergCount    = ck.emergCap ? rows.filter(r => isYes(r[ck.emergCap])).length : 0;
     const consumerCount = ck.consumerAware ? rows.filter(r => isYes(r[ck.consumerAware])).length : 0;
-    setText('kFinKnow',      ck.finKnow      ? `${fmt(finKnowPct)}%`      : '—');
-    setText('kDigitalKnow',  ck.digitalKnow  ? `${fmt(digitalKnowAvg)}%`  : '—');
+    setText('kFinKnow', ck.finKnow ? `${fmt(finKnowPct)}%` : '—');
     setText('kEmerg',    ck.emergCap      ? `${pct(emergCount, total)}%`   : '—');
     setText('kConsumer', ck.consumerAware ? `${pct(consumerCount, total)}%` : '—');
 
@@ -1695,7 +1686,6 @@
         msme:     findCol(keys, 'business_owner'),
         refugee:  findCol(keys, 'registered_refugee'),
         finKnow:       findCol(keys, 'financial_knowledge_score'),
-        digitalKnow:   findCol(keys, 'digital_knowledge_pct'),
         emergCap:      findCol(keys, 'emergency_expense_capacity'),
         consumerAware: findCol(keys, 'consumer_rights_awareness'),
       };
