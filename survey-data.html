@@ -418,8 +418,10 @@
   <div class="kpi-grid">
     <div class="kpi-card" style="text-align:center;display:flex;flex-direction:column;min-height:180px;position:relative;">
       <div class="kpi-label">Surveys Completed</div>
-      <div class="kpi-value" id="kTotal" style="color:var(--blue);flex:1;display:flex;align-items:center;justify-content:center;font-family:'Arial Narrow',Arial,sans-serif;font-weight:700;">—</div>
-      <img class="kpi-icon" src="check-mark.jpg" alt="" style="--icon-size:56px;" />
+      <div style="flex:1;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:4px;">
+        <div class="kpi-value" id="kTotal" style="color:var(--blue);font-family:'Arial Narrow',Arial,sans-serif;font-weight:700;">—</div>
+        <img src="check-mark.jpg" alt="" style="width:26px;height:26px;object-fit:contain;" />
+      </div>
       <div class="kpi-sub" id="kTotalSub">of 5,008 target</div>
       <div class="kpi-track"><div class="kpi-fill" id="kTotalBar" style="width:0"></div></div>
     </div>
