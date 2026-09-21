@@ -145,6 +145,11 @@
     .kpi-sub   { font-family: 'Raleway', sans-serif; font-size: 0.85rem; font-weight: 700; color: var(--gray); margin-top: 4px; }
     .kpi-track { height: 4px; background: #e2e8f0; border-radius: 2px; margin-top: 9px; overflow: hidden; }
     .kpi-fill  { height: 100%; border-radius: 2px; background: var(--blue); transition: width 0.7s ease; }
+    .kpi-icon {
+      position: absolute; left: 16px; top: 50%; transform: translateY(-50%);
+      width: var(--icon-size, 40px); height: var(--icon-size, 40px);
+      object-fit: contain; transition: width 0.2s ease, height 0.2s ease, left 0.2s ease;
+    }
     .kpi-card.green  .kpi-fill { background: var(--green); }
     .kpi-card.yellow .kpi-fill { background: var(--yellow); }
     .kpi-card.purple .kpi-fill { background: var(--purple); }
@@ -297,17 +302,22 @@
     @media (max-width: 1100px) {
       .kpi-grid   { grid-template-columns: repeat(3,1fr); }
       .dash-row-3 { grid-template-columns: 1fr 1fr; }
+      .kpi-value  { font-size: 2rem; }
+      .kpi-icon   { width: calc(var(--icon-size, 40px) * 0.85); height: calc(var(--icon-size, 40px) * 0.85); }
     }
     @media (max-width: 900px) {
       .kpi-grid   { grid-template-columns: 1fr 1fr; }
       .dash-row-2 { grid-template-columns: 1fr; }
       .dash-row-3 { grid-template-columns: 1fr; }
       .about-stats-grid { grid-template-columns: 1fr 1fr; }
+      .kpi-value  { font-size: 1.9rem; }
+      .kpi-icon   { width: calc(var(--icon-size, 40px) * 0.7); height: calc(var(--icon-size, 40px) * 0.7); left: 10px; }
     }
     @media (max-width: 520px) {
       .kpi-grid { grid-template-columns: 1fr; }
       .kpi-card { min-height: auto !important; }
       .kpi-value { font-size: 1.8rem; }
+      .kpi-icon  { width: calc(var(--icon-size, 40px) * 0.55); height: calc(var(--icon-size, 40px) * 0.55); left: 8px; }
       .qual-tabs { flex-wrap: wrap; }
       .filter-select { min-width: 120px; }
       #extraStatsBar { justify-content: center; }
@@ -381,27 +391,27 @@
   <div class="kpi-grid">
     <div class="kpi-card" style="text-align:center;display:flex;flex-direction:column;min-height:180px;position:relative;">
       <div class="kpi-label">Surveys Completed</div>
-      <div class="kpi-value" id="kTotal" style="color:var(--blue);flex:1;display:flex;align-items:center;justify-content:center;font-family:'Arial Narrow',Arial,sans-serif;font-weight:700;position:relative;z-index:1;background:var(--white);">—</div>
-      <img src="check-mark.jpg" alt="" style="position:absolute;left:16px;top:50%;transform:translateY(-50%);width:56px;height:56px;object-fit:contain;z-index:0;" />
+      <div class="kpi-value" id="kTotal" style="color:var(--blue);flex:1;display:flex;align-items:center;justify-content:center;font-family:'Arial Narrow',Arial,sans-serif;font-weight:700;">—</div>
+      <img class="kpi-icon" src="check-mark.jpg" alt="" style="--icon-size:56px;" />
       <div class="kpi-sub" id="kTotalSub">of 5,008 target</div>
       <div class="kpi-track"><div class="kpi-fill" id="kTotalBar" style="width:0"></div></div>
     </div>
     <div class="kpi-card" style="text-align:center;display:flex;flex-direction:column;min-height:180px;position:relative;">
       <div class="kpi-label">Persons with Disabilities</div>
-      <div class="kpi-value" id="kPwd" style="color:var(--blue);flex:1;display:flex;align-items:center;justify-content:center;font-family:'Arial Narrow',Arial,sans-serif;font-weight:700;position:relative;z-index:1;background:var(--white);">—</div>
-      <img src="PWDs.png" alt="" style="position:absolute;left:16px;top:50%;transform:translateY(-50%);width:40px;height:40px;object-fit:contain;z-index:0;" />
+      <div class="kpi-value" id="kPwd" style="color:var(--blue);flex:1;display:flex;align-items:center;justify-content:center;font-family:'Arial Narrow',Arial,sans-serif;font-weight:700;">—</div>
+      <img class="kpi-icon" src="PWDs.png" alt="" />
       <div class="kpi-sub" id="kPwdSub"></div>
     </div>
     <div class="kpi-card" style="text-align:center;display:flex;flex-direction:column;min-height:180px;position:relative;">
       <div class="kpi-label">MSMEs</div>
-      <div class="kpi-value" id="kMsme" style="color:var(--blue);flex:1;display:flex;align-items:center;justify-content:center;font-family:'Arial Narrow',Arial,sans-serif;font-weight:700;position:relative;z-index:1;background:var(--white);">—</div>
-      <img src="SMEs%20icon.png" alt="" style="position:absolute;left:16px;top:50%;transform:translateY(-50%);width:40px;height:40px;object-fit:contain;z-index:0;" />
+      <div class="kpi-value" id="kMsme" style="color:var(--blue);flex:1;display:flex;align-items:center;justify-content:center;font-family:'Arial Narrow',Arial,sans-serif;font-weight:700;">—</div>
+      <img class="kpi-icon" src="SMEs%20icon.png" alt="" />
       <div class="kpi-sub" id="kMsmeSub"></div>
     </div>
     <div class="kpi-card" style="text-align:center;display:flex;flex-direction:column;min-height:180px;position:relative;">
       <div class="kpi-label">Refugees</div>
-      <div class="kpi-value" id="kRefugee" style="color:var(--blue);flex:1;display:flex;align-items:center;justify-content:center;font-family:'Arial Narrow',Arial,sans-serif;font-weight:700;position:relative;z-index:1;background:var(--white);">—</div>
-      <img src="refugees_transparent.png" alt="" style="position:absolute;left:16px;top:50%;transform:translateY(-50%);width:40px;height:40px;object-fit:contain;z-index:0;" />
+      <div class="kpi-value" id="kRefugee" style="color:var(--blue);flex:1;display:flex;align-items:center;justify-content:center;font-family:'Arial Narrow',Arial,sans-serif;font-weight:700;">—</div>
+      <img class="kpi-icon" src="refugees_transparent.png" alt="" />
       <div class="kpi-sub" id="kRefugeeSub"></div>
     </div>
     <div class="kpi-card yellow" style="text-align:center;display:flex;flex-direction:column;min-height:180px;">
@@ -424,8 +434,8 @@
     </div>
     <div class="kpi-card purple" style="text-align:center;display:flex;flex-direction:column;min-height:180px;position:relative;">
       <div class="kpi-label">Avg Survey Duration</div>
-      <div class="kpi-value" id="kAvgDur" style="color:var(--blue);flex:1;display:flex;align-items:center;justify-content:center;font-family:'Arial Narrow',Arial,sans-serif;font-weight:700;position:relative;z-index:1;background:var(--white);">—</div>
-      <img src="Watch.png" alt="" style="position:absolute;left:16px;top:50%;transform:translateY(-50%);width:40px;height:40px;object-fit:contain;z-index:0;" />
+      <div class="kpi-value" id="kAvgDur" style="color:var(--blue);flex:1;display:flex;align-items:center;justify-content:center;font-family:'Arial Narrow',Arial,sans-serif;font-weight:700;">—</div>
+      <img class="kpi-icon" src="Watch.png" alt="" />
       <div class="kpi-sub" id="kAvgDurSub">min / survey</div>
       <div style="margin-top:6px;"><span class="v-badge v-badge-none" style="color:#1a202c;text-transform:uppercase;">Anticipated AVG duration: <span style="color:var(--blue);">50 min/survey</span></span></div>
     </div>
