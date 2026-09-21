@@ -584,7 +584,7 @@
       Village Progress
     </div>
     <div class="tbl-topbar">
-      <input class="tbl-search" type="search" id="villageSearch" placeholder="Search village, sector…" />
+      <input class="tbl-search" type="search" id="villageSearch" placeholder="Search village, cell, sector…" />
       <span class="tbl-info" id="tblInfo"></span>
     </div>
     <div class="tbl-scroll">
@@ -592,6 +592,7 @@
         <thead id="villThead">
           <tr>
             <th data-col="village">Village</th>
+            <th data-col="cell">Cell</th>
             <th data-col="sector">Sector</th>
             <th data-col="district">District</th>
             <th data-col="province">Province</th>
@@ -600,7 +601,7 @@
           </tr>
         </thead>
         <tbody id="villTbody">
-          <tr><td colspan="6" class="no-data">Loading…</td></tr>
+          <tr><td colspan="7" class="no-data">Loading…</td></tr>
         </tbody>
       </table>
     </div>
@@ -1176,6 +1177,7 @@
     let list = villageData.filter(v =>
       !search ||
       v.village.toLowerCase().includes(search) ||
+      (v.cell || '').toLowerCase().includes(search) ||
       v.sector.toLowerCase().includes(search) ||
       v.district.toLowerCase().includes(search) ||
       v.province.toLowerCase().includes(search)
@@ -1188,6 +1190,7 @@
     const atTarget = villageData.filter(v => v.status === 'complete').length;
     setText('tblInfo', `${list.length} village${list.length !== 1 ? 's' : ''} shown`);
 
+    const totalCols = 7 + strataList.length;
     const tbody = document.getElementById('villTbody');
     if (!list.length) {
       tbody.innerHTML = `<tr><td colspan="${totalCols}" class="no-data">No villages match.</td></tr>`;
@@ -1197,9 +1200,9 @@
     const strataHeaders = strataList.map(s =>
       `<th class="strata-tick-col" style="cursor:default">${s}</th>`
     ).join('');
-    const totalCols = 6 + strataList.length;
     document.getElementById('villThead').innerHTML = `<tr>
-      <th data-col="village" style="cursor:pointer">Village</th>
+      <th data-col="village"  style="cursor:pointer">Village</th>
+      <th data-col="cell"     style="cursor:pointer">Cell</th>
       <th data-col="sector"   style="cursor:pointer">Sector</th>
       <th data-col="district" style="cursor:pointer">District</th>
       <th data-col="province" style="cursor:pointer">Province</th>
@@ -1220,6 +1223,7 @@
       }).join('');
       return `<tr>
         <td class="vname">${v.village}</td>
+        <td>${v.cell || '—'}</td>
         <td>${v.sector}</td><td>${v.district}</td><td>${v.province}</td>
         <td style="text-align:right;font-weight:700">${v.count}</td>
         ${tickCells}
@@ -1320,17 +1324,22 @@
       for (const r of rows) {
         const vill = String(r[ck.village]    ?? '').trim();
         if (!vill) continue;
+        const prov = String(r[ck.province]   ?? '').trim();
         const dist = String(r[ck.district]   ?? '').trim();
         const sect = String(r[ck.sector]     ?? '').trim();
-        const mapKey = `${dist}|${sect}|${vill}`;
+        const cell = ck.cell ? String(r[ck.cell] ?? '').trim() : '';
+        // Full admin cascade, since the same village name can recur under different
+        // provinces/districts/sectors/cells (e.g. multiple "Nyakabuye" villages).
+        const mapKey = `${prov}|${dist}|${sect}|${cell}|${vill}`;
         const sv = ck.strata ? String(r[ck.strata] ?? '').trim() : '';
         if (sv) allStrata.add(sv);
         if (!vMap[mapKey]) {
           vMap[mapKey] = {
             village:  vill,
+            cell:     cell,
             sector:   sect,
             district: dist,
-            province: String(r[ck.province] ?? '').trim(),
+            province: prov,
             count: 0, strataCounts: {}, status: '',
             strataAtTarget: 0, totalStrata: 0,
           };
@@ -1672,6 +1681,7 @@
         province: findCol(keys, 'province'),
         district: findCol(keys, 'district'),
         sector:   findCol(keys, 'sector'),
+        cell:     findCol(keys, 'cell'),
         village:  findCol(keys, 'village'),
         mob:         findCol(keys, 'own_mobile_money'),
         smart:       findCol(keys, 'smartphone_access'),
