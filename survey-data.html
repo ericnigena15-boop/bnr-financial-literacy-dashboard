@@ -648,7 +648,7 @@
       <div style="flex:1;min-width:0;">
         <div class="kpi-label">Key Informant Interviews</div>
         <div class="kpi-value" id="kKii">—</div>
-        <div class="kpi-sub" id="kKiiSub">of 33 target</div>
+        <div class="kpi-sub" id="kKiiSub">of 36 target</div>
         <div class="kpi-track"><div class="kpi-fill" id="kKiiBar" style="width:0"></div></div>
         <div class="kpi-branch-row">
           <div class="kpi-branch-item"><span class="kpi-branch-num" id="kKiiTranscribed">—</span><span class="kpi-branch-lbl">Transcribed</span></div>
@@ -737,39 +737,38 @@
   // stakeholder/kiicompleted filled) or an IDI row (idsstrata/idscompleted filled)
   const QUAL_CSV_URL = atob('aHR0cHM6Ly9kb2NzLmdvb2dsZS5jb20vc3ByZWFkc2hlZXRzL2QvZS8yUEFDWC0xdlJtWEhBb0hKRlZnal9Sakg0eFpMcjVVUWpMbDlMYzkyTS1wMUgyWnZDdDVDWDZTVzB3NWlweHNJbVNDaGpENVJHeXcxdEhxUy1DMmg5OS9wdWI/Z2lkPTE3MzEyMzA4NTMmc2luZ2xlPXRydWUmb3V0cHV0PWNzdg==');
 
-  // Fixed KII target roster — 7 categories, 33 stakeholders total. Whatever the sheet
+  // Fixed KII target roster — 7 categories, 36 stakeholders total. Whatever the sheet
   // says for a name not on this list is ignored; anything on this list not yet marked
   // completed in the sheet just shows as pending.
   const KII_ROSTER = {
     'Cluster 1: Apex Regulators & Policy Architects': [
-      'National Bank of Rwanda (BNR)', 'RSSB', 'MINECOFIN'
+      'National Bank of Rwanda (BNR)', 'RSSB', 'MINECOFIN', 'RAB'
     ],
     'Cluster 2: Education & Curriculum Bodies': [
       'MINEDUC', 'Rwanda Education Board (REB)'
     ],
     'Cluster 3A: Gender & Youth-focused Institutions': [
-      'MIJEPROF', 'Gender Monitoring Office (GMO)', 'MINIYOUTH'
+      'Gender Monitoring Office (GMO)', 'FESY', 'MINIYOUTH'
     ],
     'Cluster 3B: Community & Resilience-focused Institutions': [
-      'MINALOC', 'MINEMA'
+      'MINALOC', 'MINEMA', 'INKOMOKO', 'LODA'
     ],
     'Cluster 4: Financial Sector Associations': [
       'Rwanda Bankers Association', 'ASSAR_Rwanda Insurer Association', 'Rwanda Cooperative Association',
       'AMIR_Microfinance', 'Rwanda Fintech Association'
     ],
     'Cluster 5: Digital Financial Services Providers': [
-      'MTN MOMO', 'Airtel Money', 'Bank of Kigali', 'Equity Bank'
+      'MTN MOMO', 'Airtel Money', 'Bank of Kigali', 'Urwego Bank', 'Equity Bank'
     ],
     'Cluster 6: Development Partners & NGOs': [
-      'Care International', 'AFR', 'World Vision', 'BRAC Rwanda Microfinance Company',
-      'Plan International', 'NUDOR & Handicap International'
+      'Care International', 'BRD', 'AFR', 'World Vision', 'BRAC Rwanda Microfinance Company',
+      'VBF UMUCYO', 'UNCDF', 'Plan International', 'Duterimbere IMF PLC', 'NUDOR & Handicap International'
     ],
     'Cluster 7: Small Business Owners & Informal Sector Operators': [
-      'Gakinjiro Cooperative/Association', 'Nyabugobo Transport Operators Association', 'BDF',
-      'BRD', 'UNCDF', 'LODA', 'IMF', 'RFL'
+      'Gakinjiro Cooperative/Association', 'BDF', 'BPN'
     ],
   };
-  const KII_TARGET = Object.values(KII_ROSTER).flat().length; // 33
+  const KII_TARGET = Object.values(KII_ROSTER).flat().length; // 36
 
   // Fixed IDI strata roster — each stratum has its own target, totalling 60
   const IDI_STRATA_TARGETS = {
