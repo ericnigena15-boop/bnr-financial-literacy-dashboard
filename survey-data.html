@@ -164,6 +164,7 @@
       background: var(--white); border-radius: 10px;
       padding: 20px 22px; box-shadow: 0 1px 5px rgba(0,0,0,0.07);
       transition: transform 0.18s ease, box-shadow 0.18s ease;
+      position: relative;
     }
     .dash-card:hover { transform: scale(1.012); box-shadow: 0 8px 20px rgba(0,0,0,0.14); }
     .dash-card-yn { padding-top: 14px; padding-bottom: 16px; }
@@ -253,6 +254,32 @@
     }
     .task-mark.reached { background: #c6f6d5; color: #276749; }
     .task-mark.partial { background: var(--blue-light); color: var(--blue-dark); }
+
+    /* ── Indicator info icon + popover ── */
+    .info-icon {
+      position: absolute; top: 9px; right: 10px; width: 18px; height: 18px;
+      border-radius: 50%; background: #e2e8f0; color: #4a5568;
+      font-family: 'Raleway', sans-serif; font-size: 0.66rem; font-weight: 800;
+      display: flex; align-items: center; justify-content: center;
+      cursor: pointer; user-select: none; z-index: 3;
+      transition: background 0.15s, color 0.15s;
+    }
+    .info-icon:hover, .info-icon.active { background: var(--blue); color: #fff; }
+    .info-popover {
+      position: fixed; display: none; max-width: 300px; width: calc(100vw - 32px);
+      background: #fff; border: 1px solid var(--border); border-radius: 10px;
+      box-shadow: 0 12px 30px rgba(0,0,0,0.2); padding: 14px 16px 12px;
+      font-family: 'Raleway', sans-serif; font-size: 0.78rem; line-height: 1.55;
+      color: #2d3748; z-index: 10000;
+    }
+    .info-popover.show { display: block; }
+    .info-popover-close {
+      position: absolute; top: 6px; right: 9px; cursor: pointer;
+      color: var(--gray); font-weight: 800; font-size: 0.95rem; line-height: 1;
+    }
+    .info-popover-title { font-weight: 800; font-size: 0.82rem; color: #1a202c; margin-bottom: 6px; padding-right: 18px; }
+    .info-popover-body b { color: #1a202c; }
+    .info-popover-note { margin-top: 8px; font-size: 0.7rem; color: var(--gray); font-style: italic; }
 
     /* ── Enumerator table (wide, horizontal scroll) ── */
     #enumScroll {
@@ -397,12 +424,14 @@
       <div class="kpi-track"><div class="kpi-fill" id="kTotalBar" style="width:0"></div></div>
     </div>
     <div class="kpi-card" style="text-align:center;display:flex;flex-direction:column;min-height:180px;position:relative;">
+      <span class="info-icon" data-info="pwd">i</span>
       <div class="kpi-label">Persons with Disabilities</div>
       <div class="kpi-value" id="kPwd" style="color:var(--blue);flex:1;display:flex;align-items:center;justify-content:center;font-family:'Arial Narrow',Arial,sans-serif;font-weight:700;">—</div>
       <img class="kpi-icon" src="PWDs.png" alt="" />
       <div class="kpi-sub" id="kPwdSub"></div>
     </div>
     <div class="kpi-card" style="text-align:center;display:flex;flex-direction:column;min-height:180px;position:relative;">
+      <span class="info-icon" data-info="msme">i</span>
       <div class="kpi-label">MSMEs</div>
       <div class="kpi-value" id="kMsme" style="color:var(--blue);flex:1;display:flex;align-items:center;justify-content:center;font-family:'Arial Narrow',Arial,sans-serif;font-weight:700;">—</div>
       <img class="kpi-icon" src="SMEs%20icon.png" alt="" />
@@ -459,6 +488,7 @@
     </div>
 
     <div class="dash-card dash-card-yn">
+      <span class="info-icon" data-info="mobileMoney">i</span>
       <div class="dash-card-title">Mobile Money Ownership</div>
       <div style="display:flex;justify-content:space-between;align-items:center;margin:14px 0 10px;">
         <div>
@@ -477,6 +507,7 @@
     </div>
 
     <div class="dash-card dash-card-yn">
+      <span class="info-icon" data-info="smartphone">i</span>
       <div class="dash-card-title">Smartphone Access</div>
       <div style="display:flex;justify-content:space-between;align-items:center;margin:14px 0 10px;">
         <div>
@@ -498,6 +529,7 @@
   <!-- Financial literacy indicators — 3-column row -->
   <div class="dash-row-3">
     <div class="dash-card dash-card-yn">
+      <span class="info-icon" data-info="insurance">i</span>
       <div class="dash-card-title">Insurance Coverage</div>
       <div style="display:flex;justify-content:space-between;align-items:center;margin:14px 0 10px;">
         <div>
@@ -516,6 +548,7 @@
     </div>
 
     <div class="dash-card dash-card-yn">
+      <span class="info-icon" data-info="pension">i</span>
       <div class="dash-card-title">Pension Coverage</div>
       <div style="display:flex;justify-content:space-between;align-items:center;margin:14px 0 10px;">
         <div>
@@ -534,6 +567,7 @@
     </div>
 
     <div class="dash-card dash-card-yn">
+      <span class="info-icon" data-info="training">i</span>
       <div class="dash-card-title">Financial Training</div>
       <div style="display:flex;justify-content:space-between;align-items:center;margin:14px 0 10px;">
         <div>
@@ -554,19 +588,23 @@
 
   <!-- Floating summary bar: financial knowledge / digital financial knowledge / emergency expense capacity / consumer rights awareness -->
   <div class="dash-card dash-row-1" id="extraStatsBar" style="display:flex;justify-content:space-around;align-items:center;flex-wrap:wrap;gap:16px;box-shadow:0 4px 16px rgba(0,0,0,0.12);background:#fcf7ea;">
-    <div style="text-align:center;">
+    <div style="text-align:center;position:relative;padding:14px 22px 0;">
+      <span class="info-icon" data-info="finKnow">i</span>
       <div class="kpi-label">Financial Knowledge</div>
       <div class="kpi-value" id="kFinKnow" style="font-size:1.6rem;color:#f7c35f;">—</div>
     </div>
-    <div style="text-align:center;">
+    <div style="text-align:center;position:relative;padding:14px 22px 0;">
+      <span class="info-icon" data-info="digitalKnow">i</span>
       <div class="kpi-label">Digital Financial Knowledge</div>
       <div class="kpi-value" id="kDigitalKnow" style="font-size:1.6rem;color:#f7c35f;">—</div>
     </div>
-    <div style="text-align:center;">
+    <div style="text-align:center;position:relative;padding:14px 22px 0;">
+      <span class="info-icon" data-info="emerg">i</span>
       <div class="kpi-label">Emergency Expense Capacity</div>
       <div class="kpi-value" id="kEmerg" style="font-size:1.6rem;color:#f7c35f;">—</div>
     </div>
-    <div style="text-align:center;">
+    <div style="text-align:center;position:relative;padding:14px 22px 0;">
+      <span class="info-icon" data-info="consumer">i</span>
       <div class="kpi-label">Consumer Rights Awareness</div>
       <div class="kpi-value" id="kConsumer" style="font-size:1.6rem;color:#f7c35f;">—</div>
     </div>
@@ -1724,6 +1762,104 @@
   }
 
   btnRefresh.addEventListener('click', loadData);
+
+  /* ═══════════════════════════════════════════════════
+     INDICATOR INFO POPOVERS
+     Wording/rules sourced from "BNR Dashboard Variable Guide".
+     ═══════════════════════════════════════════════════ */
+  const INFO_TEXT = {
+    pwd: {
+      title: 'Persons with Disabilities (pwd_flag)',
+      body: `B4. Do you live with any disabilities?<br>Answers: Yes; No.<br><b>Rule:</b> 1 = Yes; 0 = No. Self-reported.`
+    },
+    msme: {
+      title: 'MSMEs (business_owner)',
+      body: `B10. Do you own or run a business — even a small or informal one?<br>Answers: Yes, registered/formal; Yes, unregistered/informal; No.<br><b>Rule:</b> 1 = either Yes; 0 = No. Not an SME-size classification.`
+    },
+    mobileMoney: {
+      title: 'Mobile Money Ownership (own_mobile_money)',
+      body: `D3. Do you have a personal mobile money account in your OWN name, or do you use someone else's?<br>Answers: Yes, my own account; I use a family member's/friend's account; Never had one; Used to have one but closed it.<br><b>Rule:</b> 1 = own account; other responses = 0.`
+    },
+    smartphone: {
+      title: 'Smartphone Access (smartphone_access)',
+      body: `D1. What type of mobile device do you personally own or regularly use?<br>Answers: Smartphone; Feature phone with internet; Feature phone with no internet; None.<br><b>Rule:</b> 1 = Smartphone; other listed responses = 0.`
+    },
+    insurance: {
+      title: 'Insurance Coverage (insurance_coverage)',
+      body: `QP2_17, QP2_18, QP2_ADD_5–8: Currently holds non-compulsory investment/life, risk-protection, health, crop, livestock or property insurance.<br>Each answer: Yes; No; Don't know; Not applicable; Refused.<br><b>Rule:</b> 1 if any Yes; 0 if at least one valid Yes/No and none Yes; otherwise missing.`
+    },
+    pension: {
+      title: 'Pension Coverage (pension_coverage)',
+      body: `QP2_7: Currently holds a non-compulsory pension/retirement product. QP2_ADD_3: Currently holds a pension/retirement contribution (RSSB public pension).<br>Each answer: Yes; No; Don't know; Not applicable; Refused.<br><b>Rule:</b> 1 if either Yes; 0 if valid response and no Yes; otherwise missing.`
+    },
+    training: {
+      title: 'Financial Training (financial_training)',
+      body: `E9. Have you ever received education or training in personal finance or money management?<br>Answers: Yes; No.<br><b>Rule:</b> 1 = Yes; 0 = No.`
+    },
+    finKnow: {
+      title: 'Financial Knowledge — OECD Core (financial_knowledge_score)',
+      body: `Score = 100 × correct answers ÷ 7, from 7 OECD core items (QK3–QK7c: purchasing power under inflation, simple interest, compound interest ×2, risk-return trade-off, inflation concept, diversification).<br>QK6 counts as correct only if QK5 was also answered correctly. "Don't know", refused, irrelevant, missing and other incorrect answers score zero.<br>High knowledge = at least 5 of 7 correct (≥71.4%).`
+    },
+    digitalKnow: {
+      title: 'Digital Financial Knowledge (digital_knowledge_pct)',
+      body: `Score = 100 × correct answers ÷ 4, from 4 separate BNR digital-knowledge items (QK7d–QK7g: digital contract validity, crypto legal-tender status, branch-vs-online legal protection, crypto value volatility). Correct answer is "False" for each.<br>This is a BNR descriptive indicator outside the 7-item OECD core score — not a full OECD digital financial literacy score.`
+    },
+    emerg: {
+      title: 'Emergency Expense Capacity (emergency_expense_capacity)',
+      body: `QF4. If you personally faced a major expense today — equivalent to your own monthly income — would you be able to pay it without borrowing or asking family or friends?<br>Answers: Yes; No; Don't know; Not applicable (no personal income); Refused.<br><b>Rule:</b> 1 = Yes; 0 = No; other responses missing.`
+    },
+    consumer: {
+      title: 'Consumer Rights Awareness (consumer_rights_awareness)',
+      body: `G1. Are you aware that as a financial services consumer you have consumer rights?<br>Answers: Yes; No; Did not know.<br><b>Rule:</b> 1 = Yes; 0 = No or Did not know.`
+    },
+  };
+  const BINARY_NOTE = 'For percentages: Yes (1) ÷ valid non-missing 0/1 responses within the selected filters.';
+
+  const infoPopover = document.createElement('div');
+  infoPopover.className = 'info-popover';
+  document.body.appendChild(infoPopover);
+
+  function closeInfoPopover() {
+    infoPopover.classList.remove('show');
+    document.querySelectorAll('.info-icon.active').forEach(el => el.classList.remove('active'));
+  }
+
+  document.addEventListener('click', e => {
+    const icon = e.target.closest('.info-icon');
+    if (!icon) { closeInfoPopover(); return; }
+    const key = icon.dataset.info;
+    const info = INFO_TEXT[key];
+    if (!info) return;
+
+    const wasActive = icon.classList.contains('active');
+    closeInfoPopover();
+    if (wasActive) return; // clicking the same icon again just closes it
+
+    icon.classList.add('active');
+    const showNote = key !== 'finKnow' && key !== 'digitalKnow';
+    infoPopover.innerHTML = `
+      <span class="info-popover-close">&times;</span>
+      <div class="info-popover-title">${info.title}</div>
+      <div class="info-popover-body">${info.body}</div>
+      ${showNote ? `<div class="info-popover-note">${BINARY_NOTE}</div>` : ''}
+    `;
+    infoPopover.classList.add('show');
+
+    const r = icon.getBoundingClientRect();
+    const popW = infoPopover.offsetWidth;
+    let left = r.right - popW;
+    left = Math.max(16, Math.min(left, window.innerWidth - popW - 16));
+    let top = r.bottom + 8;
+    if (top + infoPopover.offsetHeight > window.innerHeight - 16) {
+      top = r.top - infoPopover.offsetHeight - 8;
+    }
+    infoPopover.style.left = `${left}px`;
+    infoPopover.style.top  = `${Math.max(16, top)}px`;
+  });
+
+  document.addEventListener('keydown', e => { if (e.key === 'Escape') closeInfoPopover(); });
+  window.addEventListener('resize', closeInfoPopover);
+  window.addEventListener('scroll', closeInfoPopover, true);
 
   // Read role from sessionStorage set by index.html
   const savedRole = sessionStorage.getItem('bnr_role');
