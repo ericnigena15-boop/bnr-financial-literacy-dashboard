@@ -97,7 +97,7 @@
     .data-section.show { display: block; }
 
     /* ── KPI grid ── */
-    .kpi-grid { display: grid; grid-template-columns: repeat(5,1fr); gap: 14px; margin-bottom: 16px; }
+    .kpi-grid { display: grid; grid-template-columns: repeat(6,1fr); gap: 14px; margin-bottom: 16px; }
     .qual-kpi-grid { grid-template-columns: repeat(2,1fr); }
 
     /* ── KII roster (categories × stakeholders) ── */
@@ -397,6 +397,12 @@
       <div class="kpi-value" id="kMsme" style="color:var(--blue);flex:1;display:flex;align-items:center;justify-content:center;font-family:'Arial Narrow',Arial,sans-serif;font-weight:700;">—</div>
       <img src="SMEs%20icon.png" alt="" style="position:absolute;left:16px;top:50%;transform:translateY(-50%);width:40px;height:40px;object-fit:contain;" />
       <div class="kpi-sub" id="kMsmeSub"></div>
+    </div>
+    <div class="kpi-card" style="text-align:center;display:flex;flex-direction:column;min-height:180px;position:relative;">
+      <div class="kpi-label">Refugees</div>
+      <div class="kpi-value" id="kRefugee" style="color:var(--blue);flex:1;display:flex;align-items:center;justify-content:center;font-family:'Arial Narrow',Arial,sans-serif;font-weight:700;">—</div>
+      <img src="refugees_transparent.png" alt="" style="position:absolute;left:16px;top:50%;transform:translateY(-50%);width:40px;height:40px;object-fit:contain;" />
+      <div class="kpi-sub" id="kRefugeeSub"></div>
     </div>
     <div class="kpi-card yellow" style="text-align:center;display:flex;flex-direction:column;min-height:180px;">
       <div class="kpi-label">Villages &amp; Sectors Completed</div>
@@ -1278,12 +1284,15 @@
     setWidth('kTotalBar', total, TARGET_TOTAL);
 
     const isYes = v => ['yes','true','1'].includes(String(v ?? '').trim().toLowerCase());
-    const pwdCount  = ck.pwd  ? rows.filter(r => isYes(r[ck.pwd])).length  : 0;
-    const msmeCount = ck.msme ? rows.filter(r => isYes(r[ck.msme])).length : 0;
+    const pwdCount     = ck.pwd     ? rows.filter(r => isYes(r[ck.pwd])).length     : 0;
+    const msmeCount    = ck.msme    ? rows.filter(r => isYes(r[ck.msme])).length    : 0;
+    const refugeeCount = ck.refugee ? rows.filter(r => isYes(r[ck.refugee])).length : 0;
     setText('kPwd', ck.pwd ? pwdCount.toLocaleString() : '—');
     setText('kPwdSub', ck.pwd ? `${pct(pwdCount, total)}% of respondents` : 'pwd_flag column not found');
     setText('kMsme', ck.msme ? msmeCount.toLocaleString() : '—');
     setText('kMsmeSub', ck.msme ? `${pct(msmeCount, total)}% of respondents` : 'business_owner column not found');
+    setText('kRefugee', ck.refugee ? refugeeCount.toLocaleString() : '—');
+    setText('kRefugeeSub', ck.refugee ? `${pct(refugeeCount, total)}% of respondents` : 'registered_refugee column not found');
 
     // financial_knowledge_score (OECD core financial knowledge) and digital_knowledge_pct
     // (digital financial knowledge) hold each respondent's actual score, not a yes/no
@@ -1673,6 +1682,7 @@
         dur:      findCol(keys, 'duration_minutes'),
         pwd:      findCol(keys, 'pwd_flag'),
         msme:     findCol(keys, 'business_owner'),
+        refugee:  findCol(keys, 'registered_refugee'),
         finKnow:       findCol(keys, 'financial_knowledge_score'),
         digitalKnow:   findCol(keys, 'digital_knowledge_pct'),
         emergCap:      findCol(keys, 'emergency_expense_capacity'),
