@@ -177,6 +177,8 @@
       text-align: center;
     }
     .dash-card-sub { font-size: 0.73rem; font-weight: 400; color: var(--gray); }
+    .camp-info-note { display: none; font-size: 0.73rem; font-weight: 400; color: var(--gray); margin-top: 6px; }
+    .camp-info-note.show { display: block; }
     .filter-icon { width: 20px; height: 20px; margin-right: 3px; color: var(--blue); vertical-align: middle; flex-shrink: 0; }
 
     /* ── Strata bars ── */
@@ -470,7 +472,8 @@
     <div class="dash-card">
       <div class="dash-card-title">
         Refugee Camp Progress
-        <span title="160-survey booster, 40 respondents/stratum split across 5 camps" style="display:inline-flex;align-items:center;justify-content:center;width:15px;height:15px;border-radius:50%;background:#e2e8f0;color:#4a5568;font-size:0.66rem;font-weight:800;font-family:'Raleway',sans-serif;cursor:help;vertical-align:middle;margin-left:5px;">i</span>
+        <span id="campInfoIcon" style="display:inline-flex;align-items:center;justify-content:center;width:15px;height:15px;border-radius:50%;background:#e2e8f0;color:#4a5568;font-size:0.66rem;font-weight:800;font-family:'Raleway',sans-serif;cursor:pointer;vertical-align:middle;margin-left:5px;position:relative;">i</span>
+        <div id="campInfoNote" class="camp-info-note">160-survey booster, 40 respondents/stratum split across 5 camps</div>
       </div>
       <div class="tbl-scroll">
         <table>
@@ -1816,6 +1819,21 @@
   }
 
   btnRefresh.addEventListener('click', loadData);
+
+  // Camp Progress info note — click the (i) icon to toggle, click elsewhere to close
+  const campInfoIcon = document.getElementById('campInfoIcon');
+  const campInfoNote = document.getElementById('campInfoNote');
+  if (campInfoIcon && campInfoNote) {
+    campInfoIcon.addEventListener('click', e => {
+      e.stopPropagation();
+      campInfoNote.classList.toggle('show');
+    });
+    document.addEventListener('click', e => {
+      if (!campInfoNote.contains(e.target) && e.target !== campInfoIcon) {
+        campInfoNote.classList.remove('show');
+      }
+    });
+  }
 
   // Read role from sessionStorage set by index.html
   const savedRole = sessionStorage.getItem('bnr_role');
