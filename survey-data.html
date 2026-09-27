@@ -32,6 +32,7 @@
       font-family: 'Raleway', sans-serif; background: var(--bg); color: #2d3748;
       min-height: 100vh; padding: 22px 20px 48px;
       user-select: none; -webkit-user-select: none; -ms-user-select: none;
+      overflow-x: hidden;
     }
     /* Text entry stays fully selectable/editable; data values stay copyable */
     input, textarea, select {
@@ -124,7 +125,10 @@
     }
 
     /* ── Sliding Quantitative/Qualitative viewport ── */
-    .tab-viewport { position: relative; overflow: hidden; }
+    /* No overflow:hidden here - that would make this the sticky containing block for
+       everything inside it (the filter bar, table headers), breaking their stickiness
+       against the real page scroll. Horizontal clipping happens on body instead. */
+    .tab-viewport { position: relative; }
     .data-section {
       position: absolute; top: 0; left: 0; width: 100%; box-sizing: border-box;
       transition: transform 0.45s ease;
