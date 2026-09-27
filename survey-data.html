@@ -346,7 +346,7 @@
   <div class="dash-card dash-row-1">
     <div class="dash-card-title">Survey Design &amp; Targets</div>
     <div class="about-stats-grid" style="display:grid;grid-template-columns:repeat(3,1fr);gap:14px;font-size:0.85rem;">
-      <div style="text-align:center;"><div style="color:var(--gray);font-size:0.72rem;text-transform:uppercase;letter-spacing:0.04em;">Total Surveys Anticipated</div><div style="font-weight:800;color:var(--blue);font-size:1.1rem;">5,168 respondents</div></div>
+      <div style="text-align:center;"><div style="color:var(--gray);font-size:0.72rem;text-transform:uppercase;letter-spacing:0.04em;">Total Surveys Anticipated</div><div style="font-weight:800;color:var(--blue);font-size:1.1rem;">5,168 respondents</div><div style="font-size:0.68rem;color:var(--gray);margin-top:2px;">(includes 160 from 5 refugee camps)</div></div>
       <div style="text-align:center;"><div style="color:var(--gray);font-size:0.72rem;text-transform:uppercase;letter-spacing:0.04em;">Surveys Anticipated / Day</div><div style="font-weight:800;color:var(--blue);font-size:1.1rem;">320</div></div>
       <div style="text-align:center;"><div style="color:var(--gray);font-size:0.72rem;text-transform:uppercase;letter-spacing:0.04em;">Expected Avg Duration</div><div style="font-weight:800;color:var(--blue);font-size:1.1rem;">50 minutes</div></div>
       <div style="text-align:center;"><div style="color:var(--gray);font-size:0.72rem;text-transform:uppercase;letter-spacing:0.04em;">Enumerators on the Field</div><div style="font-weight:800;color:var(--blue);font-size:1.1rem;">42</div></div>
@@ -354,7 +354,7 @@
       <div style="text-align:center;"><div style="color:var(--gray);font-size:0.72rem;text-transform:uppercase;letter-spacing:0.04em;">Surveys Anticipated per Stratum</div><div style="font-weight:800;color:var(--blue);font-size:1.1rem;">1,292 each</div></div>
     </div>
     <p style="font-size:0.78rem;color:var(--gray);text-align:center;margin-top:16px;">
-      For the qualitative component: <strong>33</strong> Key Informant Interviews across 7 institutional categories,
+      For the qualitative component: <strong>36</strong> Key Informant Interviews across 7 institutional categories,
       and <strong>60</strong> In-Depth Interviews across 9 population strata — tracked on the Qualitative tab.
     </p>
   </div>
@@ -607,6 +607,33 @@
     </div>
   </div>
 
+  <!-- Refugee camp progress (outside the 1,252-village/313-sector grid) -->
+  <div class="dash-card dash-row-1">
+    <div class="dash-card-title">
+      Refugee Camp Progress
+      <span class="dash-card-sub">160-survey booster, 40 respondents/stratum split across 5 camps</span>
+    </div>
+    <div class="tbl-scroll">
+      <table>
+        <thead>
+          <tr>
+            <th>Camp</th>
+            <th style="text-align:right">Surveys Done</th>
+            <th style="text-align:right">Target</th>
+            <th style="text-align:right">Men 16-30</th>
+            <th style="text-align:right">Women 16-30</th>
+            <th style="text-align:right">Men 31+</th>
+            <th style="text-align:right">Women 31+</th>
+            <th>Status</th>
+          </tr>
+        </thead>
+        <tbody id="campTbody">
+          <tr><td colspan="8" class="no-data">Loading…</td></tr>
+        </tbody>
+      </table>
+    </div>
+  </div>
+
   <!-- Enumerator table -->
   <div class="dash-card dash-row-1" id="enumSection">
     <div class="dash-card-title">
@@ -736,12 +763,19 @@
   // Progress and the Villages & Sectors Completed count (they still count toward
   // TARGET_TOTAL and the per-stratum Progress by Strata bars above). Matched by
   // keyword rather than exact string, in case the sheet uses "Mahama" vs "Mahama
-  // Refugee Camp" etc.
-  const CAMP_KEYWORDS = ['mahama', 'kigeme', 'kiziba', 'mugombwa', 'nyabiheke'];
-  function isCampVillage(name) {
+  // Refugee Camp" etc. Target split equally across the 4 household strata.
+  const CAMP_TARGETS = {
+    mahama:    { label: 'Mahama Refugee Camp',    target: 64 },
+    kigeme:    { label: 'Kigeme Refugee Camp',    target: 24 },
+    kiziba:    { label: 'Kiziba Refugee Camp',    target: 24 },
+    mugombwa:  { label: 'Mugombwa Refugee Camp',  target: 24 },
+    nyabiheke: { label: 'Nyabiheke Refugee Camp', target: 24 },
+  };
+  function matchCampKeyword(name) {
     const v = String(name ?? '').trim().toLowerCase();
-    return CAMP_KEYWORDS.some(k => v.includes(k));
+    return Object.keys(CAMP_TARGETS).find(k => v.includes(k)) || null;
   }
+  function isCampVillage(name) { return matchCampKeyword(name) !== null; }
   const TOTAL_SECTORS  = 313;    // a sector is complete once all 4 of its villages are (16 surveys: 4 villages × 4 strata)
   const VILLAGES_PER_SECTOR = 4;
   const STRATA_COLORS  = ['#753918','#f7c35f','#a8632f','#dba13c'];
@@ -826,6 +860,7 @@
   let villageData  = [];
   let strataList   = [];
   let enumData     = [];
+  let campData     = [];
   let overallRow  = null;
   let villSortCol = 'count',   villSortDir = -1;
   let enumSortCol = 'surveys', enumSortDir = -1;
@@ -1246,6 +1281,32 @@
     }).join('');
   }
 
+  function renderCampProgress() {
+    const tbody = document.getElementById('campTbody');
+    if (!tbody) return;
+    if (!campData.length) {
+      tbody.innerHTML = `<tr><td colspan="8" class="no-data">No camp data.</td></tr>`;
+      return;
+    }
+    tbody.innerHTML = campData.map(c => {
+      const full    = c.status === 'complete';
+      const started = c.count > 0;
+      const bc = full ? 'v-badge-done' : started ? 'v-badge-prog' : 'v-badge-none';
+      const bt = full ? '✓ Complete' : started ? 'In progress' : 'Not started';
+      const strataCells = STRATA_ORDER.map(s => {
+        const cnt = (c.strataCounts && c.strataCounts[s]) || 0;
+        return `<td style="text-align:right">${cnt} / ${c.perStratumTarget}${taskMark(cnt, c.perStratumTarget)}</td>`;
+      }).join('');
+      return `<tr>
+        <td class="vname">${c.label}</td>
+        <td style="text-align:right;font-weight:700">${c.count}</td>
+        <td style="text-align:right">${c.target}</td>
+        ${strataCells}
+        <td><span class="v-badge ${bc}">${bt}</span></td>
+      </tr>`;
+    }).join('');
+  }
+
   /* ═══════════════════════════════════════════════════
      ENUMERATOR TABLE
   ════════════════════════════════════════════════════ */
@@ -1334,10 +1395,22 @@
     /* — Village aggregation — */
     if (ck.village) {
       const vMap = {};
+      const campMap = {};
       const allStrata = new Set();
       for (const r of rows) {
         const vill = String(r[ck.village]    ?? '').trim();
-        if (!vill || isCampVillage(vill)) continue;
+        if (!vill) continue;
+        const sv = ck.strata ? String(r[ck.strata] ?? '').trim() : '';
+
+        const campKey = matchCampKeyword(vill);
+        if (campKey) {
+          if (sv) allStrata.add(sv);
+          if (!campMap[campKey]) campMap[campKey] = { count: 0, strataCounts: {} };
+          campMap[campKey].count++;
+          if (sv) campMap[campKey].strataCounts[sv] = (campMap[campKey].strataCounts[sv] || 0) + 1;
+          continue;
+        }
+
         const prov = String(r[ck.province]   ?? '').trim();
         const dist = String(r[ck.district]   ?? '').trim();
         const sect = String(r[ck.sector]     ?? '').trim();
@@ -1345,7 +1418,6 @@
         // Full admin cascade, since the same village name can recur under different
         // provinces/districts/sectors/cells (e.g. multiple "Nyakabuye" villages).
         const mapKey = `${prov}|${dist}|${sect}|${cell}|${vill}`;
-        const sv = ck.strata ? String(r[ck.strata] ?? '').trim() : '';
         if (sv) allStrata.add(sv);
         if (!vMap[mapKey]) {
           vMap[mapKey] = {
@@ -1363,6 +1435,18 @@
       }
       strataList  = sortStrata(Array.from(allStrata));
       villageData = Object.values(vMap);
+
+      campData = Object.entries(CAMP_TARGETS).map(([key, camp]) => {
+        const agg = campMap[key] || { count: 0, strataCounts: {} };
+        const perStratumTarget = camp.target / STRATA_ORDER.length;
+        const complete = STRATA_ORDER.every(s => (agg.strataCounts[s] || 0) >= perStratumTarget);
+        return {
+          label: camp.label, target: camp.target, perStratumTarget,
+          count: agg.count, strataCounts: agg.strataCounts,
+          status: complete ? 'complete' : agg.count > 0 ? 'in progress' : 'not started',
+        };
+      });
+      renderCampProgress();
       villageData.forEach(v => {
         v.totalStrata    = strataList.length;
         v.strataAtTarget = strataList.filter(s => (v.strataCounts[s] || 0) >= 1).length; // 1 respondent per stratum per village
