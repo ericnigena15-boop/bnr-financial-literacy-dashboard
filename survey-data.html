@@ -27,7 +27,6 @@
       --white:      #fff;
     }
     * { box-sizing: border-box; margin: 0; padding: 0; }
-    html { scroll-behavior: smooth; }
     body {
       font-family: 'Raleway', sans-serif; background: var(--bg); color: #2d3748;
       min-height: 100vh; padding: 22px 20px 48px;
@@ -80,7 +79,7 @@
       padding: 11px 18px; margin-bottom: 16px;
       box-shadow: 0 2px 10px rgba(0,0,0,0.10);
       display: flex; align-items: center; gap: 14px; flex-wrap: wrap;
-      position: sticky; top: var(--nav-h, 46px); z-index: 100;
+      position: sticky; top: 0; z-index: 100;
     }
     .filter-label { font-size: 0.82rem; font-weight: 700; color: #4a5568; white-space: nowrap; }
     .filter-select {
@@ -89,20 +88,6 @@
       min-width: 180px; transition: border-color 0.15s; cursor: pointer; background: var(--white);
     }
     .filter-select:focus { border-color: var(--blue); }
-
-    /* ── Section nav (jumps to a section within the active tab) ── */
-    .section-nav {
-      display: flex; gap: 6px; flex-wrap: wrap;
-      position: sticky; top: 0; z-index: 101;
-      background: var(--bg); padding: 10px 0; margin-bottom: 6px;
-    }
-    .section-nav a {
-      padding: 7px 14px; border: 1.5px solid var(--border); border-radius: 8px;
-      background: var(--white); color: #4a5568; font-family: 'Raleway', sans-serif;
-      font-size: 0.8rem; font-weight: 700; text-decoration: none;
-      cursor: pointer; transition: all 0.15s; white-space: nowrap;
-    }
-    .section-nav a:hover { border-color: var(--blue); color: var(--blue); }
 
     /* ── Page-turn arrows (switch between Quantitative / Qualitative) ── */
     .page-arrow {
@@ -133,8 +118,6 @@
     .tab-track { display: flex; width: 200%; transition: transform 0.45s ease; }
     .data-section { width: 50%; flex-shrink: 0; box-sizing: border-box; min-width: 0; }
     #dataSection:not(.show) { visibility: hidden; }
-    #secOverview, #secKpis, #secStrataCamps, #secIndicators, #secVillage, #enumSection,
-    #secKii, #secKiiRoster, #secIdi { scroll-margin-top: 60px; }
 
     /* ── KPI grid ── */
     .kpi-grid { display: grid; grid-template-columns: repeat(6,1fr); gap: 14px; margin-bottom: 16px; }
@@ -397,19 +380,6 @@
   <span id="bannerText">Loading survey data…</span>
 </div>
 
-<nav class="section-nav" id="quantNav">
-  <a href="#secOverview">Overview</a>
-  <a href="#secKpis">KPIs</a>
-  <a href="#secStrataCamps">Strata &amp; Camps</a>
-  <a href="#secIndicators">Indicators</a>
-  <a href="#secVillage">Village Progress</a>
-  <a href="#enumSection">Enumerators</a>
-</nav>
-<nav class="section-nav" id="qualNav" style="display:none;">
-  <a href="#secKii">Summary</a>
-  <a href="#secKiiRoster">KII Roster</a>
-  <a href="#secIdi">IDI Progress</a>
-</nav>
 
 <button id="toQualArrow" class="page-arrow page-arrow-right" title="Go to Qualitative">
   <span class="page-arrow-label">Qualitative</span>
@@ -456,7 +426,6 @@
 <div id="dataSection" class="data-section">
 
   <!-- About / planned targets intro card -->
-  <div id="secOverview"></div>
   <div class="dash-card dash-row-1">
     <div class="dash-card-title">Survey Design &amp; Targets</div>
     <div class="about-stats-grid" style="display:grid;grid-template-columns:repeat(3,1fr);gap:14px;font-size:0.85rem;">
@@ -474,7 +443,7 @@
   </div>
 
   <!-- KPI cards -->
-  <div id="secKpis" class="kpi-grid">
+  <div class="kpi-grid">
     <div class="kpi-card" style="text-align:center;display:flex;flex-direction:column;min-height:180px;position:relative;">
       <div class="kpi-label">Surveys Completed</div>
       <div style="flex:1;display:flex;align-items:center;justify-content:center;gap:10px;">
@@ -530,7 +499,7 @@
   </div>
 
   <!-- Strata + Refugee Camp Progress — 25/75 split -->
-  <div id="secStrataCamps" class="strata-camp-row">
+  <div class="strata-camp-row">
     <div class="dash-card">
       <div class="dash-card-title">
         Progress by Strata
@@ -571,7 +540,7 @@
   </div>
 
   <!-- Yes/No indicator cards — 5-column row -->
-  <div id="secIndicators" class="dash-row-5">
+  <div class="dash-row-5">
     <div class="dash-card dash-card-yn">
       <div class="dash-card-title">Mobile Money Ownership</div>
       <div class="yn-sentence-row">
@@ -653,7 +622,7 @@
   </div>
 
   <!-- Village-level table -->
-  <div id="secVillage" class="dash-card dash-row-1">
+  <div class="dash-card dash-row-1">
     <div class="dash-card-title">
       Village Progress
     </div>
@@ -712,7 +681,7 @@
 </div><!-- /dataSection -->
 
 <div id="qualSection" class="data-section">
-  <div id="secKii" class="kpi-grid qual-kpi-grid">
+  <div class="kpi-grid qual-kpi-grid">
     <div class="kpi-card" style="display:flex;align-items:center;gap:18px;">
       <img src="KIIs.jpg" alt="" style="width:72px;height:72px;object-fit:contain;border-radius:10px;flex-shrink:0;" />
       <div style="flex:1;min-width:0;">
@@ -741,7 +710,7 @@
     </div>
   </div>
 
-  <div id="secKiiRoster" class="dash-card dash-row-1" style="margin-top:16px;">
+  <div class="dash-card dash-row-1" style="margin-top:16px;">
     <div class="dash-card-title">KII Roster by Category</div>
     <div style="text-align:center;font-size:0.8rem;color:var(--gray);margin-bottom:14px;">
       <span class="kii-check done" style="display:inline-flex;vertical-align:middle;margin-right:5px;">✓</span>Interview Done
@@ -751,7 +720,7 @@
     <div class="kii-roster-grid" id="kiiRoster"></div>
   </div>
 
-  <div id="secIdi" class="dash-card dash-row-1">
+  <div class="dash-card dash-row-1">
     <div class="dash-card-title">IDI Progress by Strata</div>
     <div class="tbl-scroll">
       <table>
@@ -1603,14 +1572,6 @@
   let qualLoaded = false;
   let currentTab = 'quant';
 
-  // The location filter bar sticks just below the section-nav row; since that row's
-  // height varies (it wraps onto more lines at narrower widths, and differs between
-  // the Quantitative/Qualitative nav), measure it instead of assuming a fixed height.
-  function syncNavOffset() {
-    const nav = currentTab === 'qual' ? document.getElementById('qualNav') : document.getElementById('quantNav');
-    if (nav) document.documentElement.style.setProperty('--nav-h', `${nav.offsetHeight}px`);
-  }
-
   function syncViewportHeight() {
     const vp     = document.getElementById('tabViewport');
     const active = currentTab === 'qual' ? document.getElementById('qualSection') : dataSection;
@@ -1619,14 +1580,11 @@
 
   function switchTab(tab) {
     currentTab = tab;
-    document.getElementById('quantNav').style.display = tab === 'quant' ? 'flex' : 'none';
-    document.getElementById('qualNav').style.display  = tab === 'qual'  ? 'flex' : 'none';
     document.getElementById('quantFilterBar').style.display = tab === 'quant' ? 'flex' : 'none';
     document.getElementById('qualFilterBar').style.display  = tab === 'qual'  ? 'flex' : 'none';
     document.getElementById('toQualArrow').style.display  = tab === 'quant' ? 'flex' : 'none';
     document.getElementById('toQuantArrow').style.display = tab === 'qual'  ? 'flex' : 'none';
     document.getElementById('tabTrack').style.transform = tab === 'qual' ? 'translateX(-50%)' : 'translateX(0%)';
-    syncNavOffset();
     syncViewportHeight();
     if (tab === 'qual' && !qualLoaded) loadQualData();
   }
@@ -1781,9 +1739,8 @@
   let resizeDebounce = null;
   window.addEventListener('resize', () => {
     clearTimeout(resizeDebounce);
-    resizeDebounce = setTimeout(() => { syncNavOffset(); syncViewportHeight(); }, 120);
+    resizeDebounce = setTimeout(syncViewportHeight, 120);
   });
-  syncNavOffset();
   syncViewportHeight();
   btnRefreshQual.addEventListener('click', loadQualData);
 
