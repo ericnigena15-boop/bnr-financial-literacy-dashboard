@@ -123,9 +123,16 @@
       .page-arrow { padding: 12px 9px; }
     }
 
-    /* ── Quantitative/Qualitative sections — fully independent ── */
-    .data-section { display: none; }
-    .data-section.show { display: block; }
+    /* ── Sliding Quantitative/Qualitative track ── */
+    /* The filter bars live outside this wrapper (siblings, see HTML) specifically so
+       they can keep using position:sticky against the real page scroll - overflow:
+       hidden here would otherwise become their sticky containing block and break
+       that. Table headers inside .tbl-scroll are unaffected either way, since that
+       has its own local scroll container closer to them than this one. */
+    .tab-viewport { position: relative; overflow: hidden; transition: height 0.3s ease; }
+    .tab-track { display: flex; width: 200%; transition: transform 0.45s ease; }
+    .data-section { width: 50%; flex-shrink: 0; box-sizing: border-box; min-width: 0; }
+    #dataSection:not(.show) { visibility: hidden; }
     #secOverview, #secKpis, #secStrataCamps, #secIndicators, #secVillage, #enumSection,
     #secKii, #secKiiRoster, #secIdi { scroll-margin-top: 60px; }
 
@@ -413,6 +420,39 @@
   <span class="page-arrow-label">Quantitative</span>
 </button>
 
+<!-- Date filter bar — lives outside the sliding track so its sticky positioning
+     against the real page scroll isn't affected by the track's overflow clipping -->
+<div class="filter-bar" id="quantFilterBar">
+  <span class="filter-label"><svg class="filter-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="4" width="18" height="18" rx="2"/><line x1="16" y1="2" x2="16" y2="6"/><line x1="8" y1="2" x2="8" y2="6"/><line x1="3" y1="10" x2="21" y2="10"/></svg>Date:</span>
+  <select id="dateFilter" class="filter-select" style="min-width:130px">
+    <option value="">All dates</option>
+  </select>
+  <span class="filter-label"><svg class="filter-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 22s8-7.5 8-13a8 8 0 1 0-16 0c0 5.5 8 13 8 13z"/><circle cx="12" cy="9" r="2.5"/></svg>Province:</span>
+  <select id="fProvince" class="filter-select" style="min-width:130px">
+    <option value="">All</option>
+  </select>
+  <select id="fDistrict" class="filter-select" style="min-width:130px" disabled>
+    <option value="">All Districts</option>
+  </select>
+  <select id="fSector" class="filter-select" style="min-width:130px" disabled>
+    <option value="">All Sectors</option>
+  </select>
+  <select id="fVillage" class="filter-select" style="min-width:130px" disabled>
+    <option value="">All Villages</option>
+  </select>
+  <span class="filter-label"><svg class="filter-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="9" cy="7" r="3"/><path d="M2 20c0-3.3 3.1-6 7-6s7 2.7 7 6"/><circle cx="17" cy="8" r="2.5"/><path d="M23 20c0-2.5-2-4.5-4.5-5"/></svg>Strata:</span>
+  <select id="fStrata" class="filter-select" style="min-width:140px">
+    <option value="">All Strata</option>
+  </select>
+  <button id="btnClearFilters" style="padding:6px 12px;border:1.5px solid var(--border);border-radius:7px;background:#f7fafc;font-size:0.82rem;font-weight:600;color:var(--gray);cursor:pointer;">✕ Clear</button>
+  <button class="btn-refresh" id="btnRefresh" disabled>↻ Refresh</button>
+</div>
+<div class="filter-bar" id="qualFilterBar" style="justify-content:flex-end;display:none;">
+  <button class="btn-refresh" id="btnRefreshQual" disabled>↻ Refresh</button>
+</div>
+
+<div class="tab-viewport" id="tabViewport">
+<div class="tab-track" id="tabTrack">
 <div id="dataSection" class="data-section">
 
   <!-- About / planned targets intro card -->
@@ -432,34 +472,6 @@
       and <strong>60</strong> In-Depth Interviews across 9 population strata — tracked on the Qualitative tab.
     </p>
   </div>
-
-  <!-- Date filter bar -->
-  <div class="filter-bar">
-    <span class="filter-label"><svg class="filter-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="4" width="18" height="18" rx="2"/><line x1="16" y1="2" x2="16" y2="6"/><line x1="8" y1="2" x2="8" y2="6"/><line x1="3" y1="10" x2="21" y2="10"/></svg>Date:</span>
-    <select id="dateFilter" class="filter-select" style="min-width:130px">
-      <option value="">All dates</option>
-    </select>
-    <span class="filter-label"><svg class="filter-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 22s8-7.5 8-13a8 8 0 1 0-16 0c0 5.5 8 13 8 13z"/><circle cx="12" cy="9" r="2.5"/></svg>Province:</span>
-    <select id="fProvince" class="filter-select" style="min-width:130px">
-      <option value="">All</option>
-    </select>
-    <select id="fDistrict" class="filter-select" style="min-width:130px" disabled>
-      <option value="">All Districts</option>
-    </select>
-    <select id="fSector" class="filter-select" style="min-width:130px" disabled>
-      <option value="">All Sectors</option>
-    </select>
-    <select id="fVillage" class="filter-select" style="min-width:130px" disabled>
-      <option value="">All Villages</option>
-    </select>
-    <span class="filter-label"><svg class="filter-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="9" cy="7" r="3"/><path d="M2 20c0-3.3 3.1-6 7-6s7 2.7 7 6"/><circle cx="17" cy="8" r="2.5"/><path d="M23 20c0-2.5-2-4.5-4.5-5"/></svg>Strata:</span>
-    <select id="fStrata" class="filter-select" style="min-width:140px">
-      <option value="">All Strata</option>
-    </select>
-    <button id="btnClearFilters" style="padding:6px 12px;border:1.5px solid var(--border);border-radius:7px;background:#f7fafc;font-size:0.82rem;font-weight:600;color:var(--gray);cursor:pointer;">✕ Clear</button>
-    <button class="btn-refresh" id="btnRefresh" disabled>↻ Refresh</button>
-  </div>
-
 
   <!-- KPI cards -->
   <div id="secKpis" class="kpi-grid">
@@ -700,9 +712,6 @@
 </div><!-- /dataSection -->
 
 <div id="qualSection" class="data-section">
-  <div class="filter-bar" style="justify-content:flex-end;">
-    <button class="btn-refresh" id="btnRefreshQual" disabled>↻ Refresh</button>
-  </div>
   <div id="secKii" class="kpi-grid qual-kpi-grid">
     <div class="kpi-card" style="display:flex;align-items:center;gap:18px;">
       <img src="KIIs.jpg" alt="" style="width:72px;height:72px;object-fit:contain;border-radius:10px;flex-shrink:0;" />
@@ -760,6 +769,8 @@
     </div>
   </div>
 </div><!-- /qualSection -->
+</div><!-- /tabTrack -->
+</div><!-- /tabViewport -->
 
 
 <script>
@@ -1583,6 +1594,7 @@
     }
 
     renderEnumeratorTable();
+    syncViewportHeight();
   }
 
   /* ═══════════════════════════════════════════════════
@@ -1599,15 +1611,23 @@
     if (nav) document.documentElement.style.setProperty('--nav-h', `${nav.offsetHeight}px`);
   }
 
+  function syncViewportHeight() {
+    const vp     = document.getElementById('tabViewport');
+    const active = currentTab === 'qual' ? document.getElementById('qualSection') : dataSection;
+    if (vp && active) vp.style.height = `${active.offsetHeight}px`;
+  }
+
   function switchTab(tab) {
     currentTab = tab;
     document.getElementById('quantNav').style.display = tab === 'quant' ? 'flex' : 'none';
     document.getElementById('qualNav').style.display  = tab === 'qual'  ? 'flex' : 'none';
+    document.getElementById('quantFilterBar').style.display = tab === 'quant' ? 'flex' : 'none';
+    document.getElementById('qualFilterBar').style.display  = tab === 'qual'  ? 'flex' : 'none';
     document.getElementById('toQualArrow').style.display  = tab === 'quant' ? 'flex' : 'none';
     document.getElementById('toQuantArrow').style.display = tab === 'qual'  ? 'flex' : 'none';
-    document.getElementById('dataSection').classList.toggle('show', tab === 'quant');
-    document.getElementById('qualSection').classList.toggle('show', tab === 'qual');
+    document.getElementById('tabTrack').style.transform = tab === 'qual' ? 'translateX(-50%)' : 'translateX(0%)';
     syncNavOffset();
+    syncViewportHeight();
     if (tab === 'qual' && !qualLoaded) loadQualData();
   }
 
@@ -1752,6 +1772,7 @@
       setStatus(`Error: ${err.message}`, 'error');
     } finally {
       btnRefreshQual.disabled = false;
+      syncViewportHeight();
     }
   }
 
@@ -1760,9 +1781,10 @@
   let resizeDebounce = null;
   window.addEventListener('resize', () => {
     clearTimeout(resizeDebounce);
-    resizeDebounce = setTimeout(syncNavOffset, 120);
+    resizeDebounce = setTimeout(() => { syncNavOffset(); syncViewportHeight(); }, 120);
   });
   syncNavOffset();
+  syncViewportHeight();
   btnRefreshQual.addEventListener('click', loadQualData);
 
   /* ═══════════════════════════════════════════════════
