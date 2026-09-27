@@ -157,6 +157,7 @@
     /* ── Row layouts ── */
     .dash-row-2 { display: grid; grid-template-columns: 1fr 1fr; gap: 14px; margin-bottom: 16px; }
     .dash-row-3 { display: grid; grid-template-columns: repeat(3, 1fr); gap: 14px; margin-bottom: 16px; }
+    .dash-row-5 { display: grid; grid-template-columns: repeat(5, 1fr); gap: 14px; margin-bottom: 16px; }
     .dash-row-1 { margin-bottom: 16px; }
 
     /* ── Dash card ── */
@@ -308,6 +309,7 @@
     @media (max-width: 1100px) {
       .kpi-grid   { grid-template-columns: repeat(3,1fr); }
       .dash-row-3 { grid-template-columns: 1fr 1fr; }
+      .dash-row-5 { grid-template-columns: repeat(3,1fr); }
       .kpi-value  { font-size: 2rem; }
       .kpi-icon   { width: calc(var(--icon-size, 40px) * 0.85); height: calc(var(--icon-size, 40px) * 0.85); }
     }
@@ -315,12 +317,14 @@
       .kpi-grid   { grid-template-columns: 1fr 1fr; }
       .dash-row-2 { grid-template-columns: 1fr; }
       .dash-row-3 { grid-template-columns: 1fr; }
+      .dash-row-5 { grid-template-columns: 1fr 1fr; }
       .about-stats-grid { grid-template-columns: 1fr 1fr; }
       .kpi-value  { font-size: 1.9rem; }
       .kpi-icon   { width: calc(var(--icon-size, 40px) * 0.7); height: calc(var(--icon-size, 40px) * 0.7); left: 10px; }
     }
     @media (max-width: 520px) {
       .kpi-grid { grid-template-columns: 1fr; }
+      .dash-row-5 { grid-template-columns: 1fr; }
       .kpi-card { min-height: auto !important; }
       .kpi-value { font-size: 1.8rem; }
       .kpi-icon  { width: calc(var(--icon-size, 40px) * 0.55); height: calc(var(--icon-size, 40px) * 0.55); left: 8px; }
@@ -449,14 +453,8 @@
     </div>
   </div>
 
-  <!-- Shared key for all Yes/No cards below -->
-  <div style="text-align:center;font-size:0.8rem;color:var(--gray);margin-bottom:10px;">
-    <span style="display:inline-block;width:10px;height:10px;border-radius:50%;background:#753918;margin-right:5px;"></span>Yes
-    <span style="display:inline-block;width:10px;height:10px;border-radius:50%;background:#a0aec0;margin:0 5px 0 16px;"></span>No
-  </div>
-
-  <!-- Strata + Phone ownership — 3-column row -->
-  <div class="dash-row-3">
+  <!-- Strata + Refugee Camp Progress — 2-column row -->
+  <div class="dash-row-2">
     <div class="dash-card">
       <div class="dash-card-title">
         Progress by Strata
@@ -466,6 +464,41 @@
       </div>
     </div>
 
+    <div class="dash-card">
+      <div class="dash-card-title">
+        Refugee Camp Progress
+        <span class="dash-card-sub">160-survey booster, 40 respondents/stratum split across 5 camps</span>
+      </div>
+      <div class="tbl-scroll">
+        <table>
+          <thead>
+            <tr>
+              <th>Camp</th>
+              <th style="text-align:right">Surveys Done</th>
+              <th style="text-align:right">Target</th>
+              <th style="text-align:right">Men 16-30</th>
+              <th style="text-align:right">Women 16-30</th>
+              <th style="text-align:right">Men 31+</th>
+              <th style="text-align:right">Women 31+</th>
+              <th>Status</th>
+            </tr>
+          </thead>
+          <tbody id="campTbody">
+            <tr><td colspan="8" class="no-data">Loading…</td></tr>
+          </tbody>
+        </table>
+      </div>
+    </div>
+  </div>
+
+  <!-- Shared key for all Yes/No cards below -->
+  <div style="text-align:center;font-size:0.8rem;color:var(--gray);margin-bottom:10px;">
+    <span style="display:inline-block;width:10px;height:10px;border-radius:50%;background:#753918;margin-right:5px;"></span>Yes
+    <span style="display:inline-block;width:10px;height:10px;border-radius:50%;background:#a0aec0;margin:0 5px 0 16px;"></span>No
+  </div>
+
+  <!-- Yes/No indicator cards — 5-column row -->
+  <div class="dash-row-5">
     <div class="dash-card dash-card-yn">
       <div class="dash-card-title">Mobile Money Ownership</div>
       <div class="yn-sentence-row">
@@ -487,10 +520,7 @@
         <canvas id="smartChart"></canvas>
       </div>
     </div>
-  </div>
 
-  <!-- Financial literacy indicators — 3-column row -->
-  <div class="dash-row-3">
     <div class="dash-card dash-card-yn">
       <div class="dash-card-title">Insurance Coverage</div>
       <div class="yn-sentence-row">
@@ -571,33 +601,6 @@
         </thead>
         <tbody id="villTbody">
           <tr><td colspan="7" class="no-data">Loading…</td></tr>
-        </tbody>
-      </table>
-    </div>
-  </div>
-
-  <!-- Refugee camp progress (outside the 1,252-village/313-sector grid) -->
-  <div class="dash-card dash-row-1">
-    <div class="dash-card-title">
-      Refugee Camp Progress
-      <span class="dash-card-sub">160-survey booster, 40 respondents/stratum split across 5 camps</span>
-    </div>
-    <div class="tbl-scroll">
-      <table>
-        <thead>
-          <tr>
-            <th>Camp</th>
-            <th style="text-align:right">Surveys Done</th>
-            <th style="text-align:right">Target</th>
-            <th style="text-align:right">Men 16-30</th>
-            <th style="text-align:right">Women 16-30</th>
-            <th style="text-align:right">Men 31+</th>
-            <th style="text-align:right">Women 31+</th>
-            <th>Status</th>
-          </tr>
-        </thead>
-        <tbody id="campTbody">
-          <tr><td colspan="8" class="no-data">Loading…</td></tr>
         </tbody>
       </table>
     </div>
