@@ -1702,17 +1702,34 @@
 
       if (!colKeys.unique) throw new Error(`"submission_id" column not found. Columns: ${keys.join(', ')}`);
 
-      allRows = rows;
+      // Drop exact re-submissions (same submission_id appearing more than once in the
+      // sheet, e.g. a row synced twice) so village/sector/enumerator/strata counts match
+      // the true number of unique respondents, not raw sheet rows.
+      const seenIds = new Set();
+      const dedupedRows = [];
+      for (const r of rows) {
+        const uid = String(r[colKeys.unique] ?? '').trim();
+        if (uid) {
+          if (seenIds.has(uid)) continue;
+          seenIds.add(uid);
+        }
+        dedupedRows.push(r);
+      }
+      if (dedupedRows.length !== rows.length) {
+        console.warn(`Dropped ${rows.length - dedupedRows.length} duplicate submission_id row(s).`);
+      }
 
-      populateDateFilter(rows, colKeys.date);
-      populateLocationFilters(rows);
+      allRows = dedupedRows;
 
-      renderAll(rows);
+      populateDateFilter(dedupedRows, colKeys.date);
+      populateLocationFilters(dedupedRows);
+
+      renderAll(dedupedRows);
 
       dataSection.classList.add('show');
       if (currentRole) applyRole(currentRole);
       setStatus(
-        `✓ ${rows.length.toLocaleString()} survey rows loaded · ${new Date().toLocaleTimeString()}`,
+        `✓ ${dedupedRows.length.toLocaleString()} survey rows loaded · ${new Date().toLocaleTimeString()}`,
         'ready'
       );
     } catch (err) {
