@@ -27,7 +27,18 @@
       --white:      #fff;
     }
     * { box-sizing: border-box; margin: 0; padding: 0; }
-    body { font-family: 'Raleway', sans-serif; background: var(--bg); color: #2d3748; min-height: 100vh; padding: 22px 20px 48px; }
+    body {
+      font-family: 'Raleway', sans-serif; background: var(--bg); color: #2d3748;
+      min-height: 100vh; padding: 22px 20px 48px;
+      user-select: none; -webkit-user-select: none; -ms-user-select: none;
+    }
+    /* Text entry stays fully selectable/editable; data values stay copyable */
+    input, textarea, select {
+      user-select: text; -webkit-user-select: text; -ms-user-select: text;
+    }
+    td, .kpi-value, .kpi-sub, .yn-sentence, .strata-cnt, .kii-stakeholder-row span:last-child {
+      user-select: text; -webkit-user-select: text; -ms-user-select: text;
+    }
 
     /* ── Banner ── */
     #banner {
