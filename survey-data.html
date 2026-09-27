@@ -168,7 +168,8 @@
       transition: transform 0.18s ease, box-shadow 0.18s ease;
     }
     .dash-card:hover { transform: scale(1.012); box-shadow: 0 8px 20px rgba(0,0,0,0.14); }
-    .dash-card-yn { padding-top: 14px; padding-bottom: 16px; }
+    .dash-card-yn { padding-top: 14px; padding-bottom: 16px; display: flex; flex-direction: column; }
+    .yn-chart-wrap { height: 42px; position: relative; margin-top: auto; }
     .dash-card-title {
       font-family: 'Raleway', sans-serif;
       font-size: 0.87rem; font-weight: 700; color: #1a202c;
@@ -507,7 +508,7 @@
         <img class="yn-sentence-icon" src="Momo.png" alt="" />
         <div class="yn-sentence"><span class="yn-sentence-pct"><span id="mob-yes-count">—</span>%</span> of <span id="mob-total">—</span> respondents have a personal mobile money account.</div>
       </div>
-      <div style="height:42px;position:relative;">
+      <div class="yn-chart-wrap">
         <canvas id="mobChart"></canvas>
       </div>
     </div>
@@ -518,7 +519,7 @@
         <img class="yn-sentence-icon" src="black-white-image-person-holding-phone.avif" alt="" />
         <div class="yn-sentence"><span class="yn-sentence-pct"><span id="smart-yes-count">—</span>%</span> of <span id="smart-total">—</span> respondents own or use a smartphone.</div>
       </div>
-      <div style="height:42px;position:relative;">
+      <div class="yn-chart-wrap">
         <canvas id="smartChart"></canvas>
       </div>
     </div>
@@ -529,7 +530,7 @@
         <img class="yn-sentence-icon" src="insurance-icon-10.png" alt="" />
         <div class="yn-sentence"><span class="yn-sentence-pct"><span id="ins-yes-count">—</span>%</span> of <span id="ins-total">—</span> respondents hold some form of insurance coverage.</div>
       </div>
-      <div style="height:42px;position:relative;">
+      <div class="yn-chart-wrap">
         <canvas id="insChart"></canvas>
       </div>
     </div>
@@ -540,7 +541,7 @@
         <img class="yn-sentence-icon" src="retirement.jpg" alt="" />
         <div class="yn-sentence"><span class="yn-sentence-pct"><span id="pen-yes-count">—</span>%</span> of <span id="pen-total">—</span> respondents hold a pension or retirement product.</div>
       </div>
-      <div style="height:42px;position:relative;">
+      <div class="yn-chart-wrap">
         <canvas id="penChart"></canvas>
       </div>
     </div>
@@ -551,7 +552,7 @@
         <img class="yn-sentence-icon" src="financial-training-icon.avif" alt="" />
         <div class="yn-sentence"><span class="yn-sentence-pct"><span id="fin-yes-count">—</span>%</span> of <span id="fin-total">—</span> respondents have received financial training.</div>
       </div>
-      <div style="height:42px;position:relative;">
+      <div class="yn-chart-wrap">
         <canvas id="finChart"></canvas>
       </div>
     </div>
