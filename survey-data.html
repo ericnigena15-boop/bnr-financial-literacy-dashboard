@@ -346,12 +346,12 @@
   <div class="dash-card dash-row-1">
     <div class="dash-card-title">Survey Design &amp; Targets</div>
     <div class="about-stats-grid" style="display:grid;grid-template-columns:repeat(3,1fr);gap:14px;font-size:0.85rem;">
-      <div style="text-align:center;"><div style="color:var(--gray);font-size:0.72rem;text-transform:uppercase;letter-spacing:0.04em;">Total Surveys Anticipated</div><div style="font-weight:800;color:var(--blue);font-size:1.1rem;">5,008 respondents</div></div>
+      <div style="text-align:center;"><div style="color:var(--gray);font-size:0.72rem;text-transform:uppercase;letter-spacing:0.04em;">Total Surveys Anticipated</div><div style="font-weight:800;color:var(--blue);font-size:1.1rem;">5,168 respondents</div></div>
       <div style="text-align:center;"><div style="color:var(--gray);font-size:0.72rem;text-transform:uppercase;letter-spacing:0.04em;">Surveys Anticipated / Day</div><div style="font-weight:800;color:var(--blue);font-size:1.1rem;">320</div></div>
       <div style="text-align:center;"><div style="color:var(--gray);font-size:0.72rem;text-transform:uppercase;letter-spacing:0.04em;">Expected Avg Duration</div><div style="font-weight:800;color:var(--blue);font-size:1.1rem;">50 minutes</div></div>
       <div style="text-align:center;"><div style="color:var(--gray);font-size:0.72rem;text-transform:uppercase;letter-spacing:0.04em;">Enumerators on the Field</div><div style="font-weight:800;color:var(--blue);font-size:1.1rem;">42</div></div>
       <div style="text-align:center;"><div style="color:var(--gray);font-size:0.72rem;text-transform:uppercase;letter-spacing:0.04em;">Sectors that will be Reached Out</div><div style="font-weight:800;color:var(--blue);font-size:1.1rem;">313 sectors (1,252 villages)</div></div>
-      <div style="text-align:center;"><div style="color:var(--gray);font-size:0.72rem;text-transform:uppercase;letter-spacing:0.04em;">Surveys Anticipated per Stratum</div><div style="font-weight:800;color:var(--blue);font-size:1.1rem;">1,252 each</div></div>
+      <div style="text-align:center;"><div style="color:var(--gray);font-size:0.72rem;text-transform:uppercase;letter-spacing:0.04em;">Surveys Anticipated per Stratum</div><div style="font-weight:800;color:var(--blue);font-size:1.1rem;">1,292 each</div></div>
     </div>
     <p style="font-size:0.78rem;color:var(--gray);text-align:center;margin-top:16px;">
       For the qualitative component: <strong>33</strong> Key Informant Interviews across 7 institutional categories,
@@ -395,7 +395,7 @@
         <img src="check-mark.jpg" alt="" style="width:30px;height:30px;object-fit:contain;flex-shrink:0;" />
         <div class="kpi-value" id="kTotal" style="color:var(--blue);font-family:'Arial Narrow',Arial,sans-serif;font-weight:700;">—</div>
       </div>
-      <div class="kpi-sub" id="kTotalSub">of 5,008 target</div>
+      <div class="kpi-sub" id="kTotalSub">of 5,168 target</div>
       <div class="kpi-track"><div class="kpi-fill" id="kTotalBar" style="width:0"></div></div>
     </div>
     <div class="kpi-card" style="text-align:center;display:flex;flex-direction:column;min-height:180px;position:relative;">
@@ -724,10 +724,24 @@
   ════════════════════════════════════════════════════ */
   // Not stored as plain text on purpose — see note in loadData(). Decoded at runtime.
   const CSV_URL     = atob('aHR0cHM6Ly9kb2NzLmdvb2dsZS5jb20vc3ByZWFkc2hlZXRzL2QvZS8yUEFDWC0xdlJtWEhBb0hKRlZnal9Sakg0eFpMcjVVUWpMbDlMYzkyTS1wMUgyWnZDdDVDWDZTVzB3NWlweHNJbVNDaGpENVJHeXcxdEhxUy1DMmg5OS9wdWI/Z2lkPTAmc2luZ2xlPXRydWUmb3V0cHV0PWNzdg==');
-  const TARGET_TOTAL   = 5008;   // 1,252 villages × 4 strata (one respondent per stratum per village)
-  const TARGET_STRATA  = 1252;   // per stratum: Men 16-30 / Men 31+ / Women 16-30 / Women 31+
+  // 5,008 household target (1,252 villages × 4 strata) + 160 refugee-camp booster
+  // (Mahama 64, Kigeme/Kiziba/Mugombwa/Nyabiheke 24 each), split equally across the
+  // same 4 strata per camp (Mahama 16/stratum, other camps 6/stratum -> +40/stratum).
+  const TARGET_TOTAL   = 5168;
+  const TARGET_STRATA  = 1292;   // per stratum: Men 16-30 / Men 31+ / Women 16-30 / Women 31+
   const TARGET_VILLAGE = 4;      // respondents per village
   const TOTAL_VILLAGES = 1252;   // 313 sectors × 4 villages/sector
+  // Camp names live in the same "village" column as regular villages, but camps sit
+  // outside the 1,252-village/313-sector grid, so they're excluded from Village
+  // Progress and the Villages & Sectors Completed count (they still count toward
+  // TARGET_TOTAL and the per-stratum Progress by Strata bars above). Matched by
+  // keyword rather than exact string, in case the sheet uses "Mahama" vs "Mahama
+  // Refugee Camp" etc.
+  const CAMP_KEYWORDS = ['mahama', 'kigeme', 'kiziba', 'mugombwa', 'nyabiheke'];
+  function isCampVillage(name) {
+    const v = String(name ?? '').trim().toLowerCase();
+    return CAMP_KEYWORDS.some(k => v.includes(k));
+  }
   const TOTAL_SECTORS  = 313;    // a sector is complete once all 4 of its villages are (16 surveys: 4 villages × 4 strata)
   const VILLAGES_PER_SECTOR = 4;
   const STRATA_COLORS  = ['#753918','#f7c35f','#a8632f','#dba13c'];
@@ -1323,7 +1337,7 @@
       const allStrata = new Set();
       for (const r of rows) {
         const vill = String(r[ck.village]    ?? '').trim();
-        if (!vill) continue;
+        if (!vill || isCampVillage(vill)) continue;
         const prov = String(r[ck.province]   ?? '').trim();
         const dist = String(r[ck.district]   ?? '').trim();
         const sect = String(r[ck.sector]     ?? '').trim();
