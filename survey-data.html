@@ -178,8 +178,9 @@
     }
     .dash-card-sub { font-size: 0.73rem; font-weight: 400; color: var(--gray); }
     .camp-info-wrap { position: relative; display: inline-block; }
+    .camp-info-icon.active { background: var(--blue) !important; color: #fff !important; }
     .camp-info-note {
-      display: none; position: absolute; top: 24px; left: 50%; transform: translateX(-50%);
+      display: none; position: absolute; bottom: 24px; left: 50%; transform: translateX(-50%);
       width: 220px; background: #fff; border: 1px solid var(--border); border-radius: 8px;
       box-shadow: 0 10px 26px rgba(0,0,0,0.2); padding: 10px 12px;
       font-size: 0.73rem; font-weight: 400; line-height: 1.5; color: #2d3748;
@@ -480,7 +481,7 @@
       <div class="dash-card-title">
         Refugee Camp Progress
         <span class="camp-info-wrap">
-          <span id="campInfoIcon" style="display:inline-flex;align-items:center;justify-content:center;width:15px;height:15px;border-radius:50%;background:#e2e8f0;color:#4a5568;font-size:0.66rem;font-weight:800;font-family:'Raleway',sans-serif;cursor:pointer;vertical-align:middle;margin-left:5px;">i</span>
+          <span id="campInfoIcon" class="camp-info-icon" style="display:inline-flex;align-items:center;justify-content:center;width:15px;height:15px;border-radius:50%;background:#e2e8f0;color:#4a5568;font-size:0.66rem;font-weight:800;font-family:'Raleway',sans-serif;cursor:pointer;vertical-align:middle;margin-left:5px;transition:background 0.15s,color 0.15s;">i</span>
           <div id="campInfoNote" class="camp-info-note">160-survey booster, 40 respondents/stratum split across 5 camps</div>
         </span>
       </div>
@@ -1836,10 +1837,12 @@
     campInfoIcon.addEventListener('click', e => {
       e.stopPropagation();
       campInfoNote.classList.toggle('show');
+      campInfoIcon.classList.toggle('active');
     });
     document.addEventListener('click', e => {
       if (!campInfoNote.contains(e.target) && e.target !== campInfoIcon) {
         campInfoNote.classList.remove('show');
+        campInfoIcon.classList.remove('active');
       }
     });
   }
