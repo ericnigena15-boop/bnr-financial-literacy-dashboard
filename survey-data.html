@@ -27,11 +27,7 @@
       --white:      #fff;
     }
     * { box-sizing: border-box; margin: 0; padding: 0; }
-    /* overflow-x lives on html, not body: body has horizontal padding, and overflow
-       clips at the padding-box edge - a sliver of whatever overflows would still show
-       inside that padding gap. html has no padding, so its clip edge is the true
-       viewport edge. */
-    html { scroll-behavior: smooth; overflow-x: hidden; }
+    html { scroll-behavior: smooth; }
     body {
       font-family: 'Raleway', sans-serif; background: var(--bg); color: #2d3748;
       min-height: 100vh; padding: 22px 20px 48px;
@@ -127,18 +123,9 @@
       .page-arrow { padding: 12px 9px; }
     }
 
-    /* ── Sliding Quantitative/Qualitative track ── */
-    /* Side-by-side flex track (not absolute-positioned overlapping panels) - each panel
-       has its own place in normal flow, so there's no risk of one showing through the
-       other. No overflow:hidden on any ancestor of the panels themselves, since that
-       would become their sticky containing block and break the filter bar / table
-       header stickiness; the track's horizontal overflow is clipped on body instead. */
-    .tab-track {
-      display: flex; width: 200%;
-      transition: transform 0.45s ease;
-    }
-    .data-section { width: 50%; flex-shrink: 0; box-sizing: border-box; min-width: 0; }
-    #dataSection:not(.show) { visibility: hidden; }
+    /* ── Quantitative/Qualitative sections — fully independent ── */
+    .data-section { display: none; }
+    .data-section.show { display: block; }
     #secOverview, #secKpis, #secStrataCamps, #secIndicators, #secVillage, #enumSection,
     #secKii, #secKiiRoster, #secIdi { scroll-margin-top: 60px; }
 
@@ -426,7 +413,6 @@
   <span class="page-arrow-label">Quantitative</span>
 </button>
 
-<div class="tab-track" id="tabTrack">
 <div id="dataSection" class="data-section">
 
   <!-- About / planned targets intro card -->
@@ -774,7 +760,6 @@
     </div>
   </div>
 </div><!-- /qualSection -->
-</div><!-- /tabTrack -->
 
 
 <script>
@@ -1620,7 +1605,8 @@
     document.getElementById('qualNav').style.display  = tab === 'qual'  ? 'flex' : 'none';
     document.getElementById('toQualArrow').style.display  = tab === 'quant' ? 'flex' : 'none';
     document.getElementById('toQuantArrow').style.display = tab === 'qual'  ? 'flex' : 'none';
-    document.getElementById('tabTrack').style.transform = tab === 'qual' ? 'translateX(-50%)' : 'translateX(0%)';
+    document.getElementById('dataSection').classList.toggle('show', tab === 'quant');
+    document.getElementById('qualSection').classList.toggle('show', tab === 'qual');
     syncNavOffset();
     if (tab === 'qual' && !qualLoaded) loadQualData();
   }
