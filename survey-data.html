@@ -783,7 +783,10 @@
   // Progress and the Villages & Sectors Completed count (they still count toward
   // TARGET_TOTAL and the per-stratum Progress by Strata bars above). Matched by
   // keyword rather than exact string, in case the sheet uses "Mahama" vs "Mahama
-  // Refugee Camp" etc. Target split equally across the 4 household strata.
+  // Refugee Camp" etc. - but ALSO requires "camp" in the name, since an ordinary
+  // village happens to be named exactly "Mugombwa" (Cyanika sector, Nyamagabe) and
+  // would otherwise be wrongly swept into the camp bucket by a bare keyword match.
+  // Target split equally across the 4 household strata.
   const CAMP_TARGETS = {
     mahama:    { label: 'Mahama Refugee Camp',    target: 64 },
     kigeme:    { label: 'Kigeme Refugee Camp',    target: 24 },
@@ -793,6 +796,7 @@
   };
   function matchCampKeyword(name) {
     const v = String(name ?? '').trim().toLowerCase();
+    if (!v.includes('camp')) return null;
     return Object.keys(CAMP_TARGETS).find(k => v.includes(k)) || null;
   }
   function isCampVillage(name) { return matchCampKeyword(name) !== null; }
